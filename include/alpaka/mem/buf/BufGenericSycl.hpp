@@ -26,7 +26,7 @@
 #    include <memory>
 #    include <type_traits>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     //! The SYCL memory buffer.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
@@ -42,7 +42,7 @@ namespace alpaka::experimental
         //! Constructor
         template<typename TExtent, typename Deleter>
         BufGenericSycl(
-            experimental::DevGenericSycl<TPltf> const& dev,
+            DevGenericSycl<TPltf> const& dev,
             TElem* const pMem,
             Deleter deleter,
             TExtent const& extent)
@@ -62,26 +62,26 @@ namespace alpaka::experimental
                 "The idx type of TExtent and the TIdx template parameter have to be identical!");
         }
 
-        experimental::DevGenericSycl<TPltf> m_dev;
+        DevGenericSycl<TPltf> m_dev;
         Vec<TDim, TIdx> m_extentElements;
         std::shared_ptr<TElem> m_spMem;
     };
-} // namespace alpaka::experimental
+} // namespace alpaka
 
 namespace alpaka::trait
 {
     //! The BufGenericSycl device type trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct DevType<experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct DevType<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
-        using type = experimental::DevGenericSycl<TPltf>;
+        using type = DevGenericSycl<TPltf>;
     };
 
     //! The BufGenericSycl device get trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct GetDev<experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct GetDev<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
-        ALPAKA_FN_HOST static auto getDev(experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf)
+        ALPAKA_FN_HOST static auto getDev(BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf)
         {
             return buf.m_dev;
         }
@@ -89,25 +89,25 @@ namespace alpaka::trait
 
     //! The BufGenericSycl dimension getter trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct DimType<experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct DimType<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
         using type = TDim;
     };
 
     //! The BufGenericSycl memory element type get trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct ElemType<experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct ElemType<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
         using type = TElem;
     };
 
     //! The BufGenericSycl extent get trait specialization.
     template<typename TIdxIntegralConst, typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct GetExtent<TIdxIntegralConst, experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct GetExtent<TIdxIntegralConst, BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
         static_assert(TDim::value > TIdxIntegralConst::value, "Requested dimension out of bounds");
 
-        ALPAKA_FN_HOST static auto getExtent(experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf) -> TIdx
+        ALPAKA_FN_HOST static auto getExtent(BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf) -> TIdx
         {
             return buf.m_extentElements[TIdxIntegralConst::value];
         }
@@ -115,15 +115,15 @@ namespace alpaka::trait
 
     //! The BufGenericSycl native pointer get trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct GetPtrNative<experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct GetPtrNative<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
-        ALPAKA_FN_HOST static auto getPtrNative(experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf)
+        ALPAKA_FN_HOST static auto getPtrNative(BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf)
             -> TElem const*
         {
             return buf.m_spMem.get();
         }
 
-        ALPAKA_FN_HOST static auto getPtrNative(experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>& buf) -> TElem*
+        ALPAKA_FN_HOST static auto getPtrNative(BufGenericSycl<TElem, TDim, TIdx, TPltf>& buf) -> TElem*
         {
             return buf.m_spMem.get();
         }
@@ -131,11 +131,11 @@ namespace alpaka::trait
 
     //! The BufGenericSycl pointer on device get trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct GetPtrDev<experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>, experimental::DevGenericSycl<TPltf>>
+    struct GetPtrDev<BufGenericSycl<TElem, TDim, TIdx, TPltf>, DevGenericSycl<TPltf>>
     {
         ALPAKA_FN_HOST static auto getPtrDev(
-            experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf,
-            experimental::DevGenericSycl<TPltf> const& dev) -> TElem const*
+            BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf,
+            DevGenericSycl<TPltf> const& dev) -> TElem const*
         {
             if(dev == getDev(buf))
             {
@@ -148,8 +148,8 @@ namespace alpaka::trait
         }
 
         ALPAKA_FN_HOST static auto getPtrDev(
-            experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>& buf,
-            experimental::DevGenericSycl<TPltf> const& dev) -> TElem*
+            BufGenericSycl<TElem, TDim, TIdx, TPltf>& buf,
+            DevGenericSycl<TPltf> const& dev) -> TElem*
         {
             if(dev == getDev(buf))
             {
@@ -164,11 +164,11 @@ namespace alpaka::trait
 
     //! The SYCL memory allocation trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct BufAlloc<TElem, TDim, TIdx, experimental::DevGenericSycl<TPltf>>
+    struct BufAlloc<TElem, TDim, TIdx, DevGenericSycl<TPltf>>
     {
         template<typename TExtent>
-        ALPAKA_FN_HOST static auto allocBuf(experimental::DevGenericSycl<TPltf> const& dev, TExtent const& extent)
-            -> experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>
+        ALPAKA_FN_HOST static auto allocBuf(DevGenericSycl<TPltf> const& dev, TExtent const& extent)
+            -> BufGenericSycl<TElem, TDim, TIdx, TPltf>
         {
             ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
@@ -178,21 +178,21 @@ namespace alpaka::trait
                 dev.get_context());
             auto deleter = [&](TElem* ptr) { sycl::free(ptr, dev.get_context()); };
 
-            return experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>(dev, memPtr, std::move(deleter), extent);
+            return BufGenericSycl<TElem, TDim, TIdx, TPltf>(dev, memPtr, std::move(deleter), extent);
         }
     };
 
     //! The BufGenericSycl stream-ordered memory allocation capability trait specialization.
     template<typename TDim, typename TPltf>
-    struct HasAsyncBufSupport<TDim, experimental::DevGenericSycl<TPltf>> : public std::false_type
+    struct HasAsyncBufSupport<TDim, DevGenericSycl<TPltf>> : public std::false_type
     {
     };
 
     //! The BufGenericSycl offset get trait specialization.
     template<typename TIdxIntegralConst, typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct GetOffset<TIdxIntegralConst, experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct GetOffset<TIdxIntegralConst, BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
-        static auto getOffset(experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf> const&) -> TIdx
+        static auto getOffset(BufGenericSycl<TElem, TDim, TIdx, TPltf> const&) -> TIdx
         {
             return 0u;
         }
@@ -200,12 +200,12 @@ namespace alpaka::trait
 
     //! The pinned/mapped memory allocation trait specialization for the SYCL devices.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct BufAllocMapped<TElem, TDim, TIdx, experimental::DevGenericSycl<TPltf>>
+    struct BufAllocMapped<TElem, TDim, TIdx, DevGenericSycl<TPltf>>
     {
         template<typename TExtent>
         ALPAKA_FN_HOST static auto allocMappedBuf(
             DevCpu const& host,
-            experimental::DevGenericSycl<TPltf> const& dev,
+            DevGenericSycl<TPltf> const& dev,
             TExtent const& extent) -> BufCpu<TElem, TDim, TIdx>
         {
             ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
@@ -222,24 +222,24 @@ namespace alpaka::trait
 
     //! The BufGenericSycl idx type trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct IdxType<experimental::BufGenericSycl<TElem, TDim, TIdx, TPltf>>
+    struct IdxType<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
         using type = TIdx;
     };
 
     //! The BufCpu pointer on SYCL device get trait specialization.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct GetPtrDev<BufCpu<TElem, TDim, TIdx>, experimental::DevGenericSycl<TPltf>>
+    struct GetPtrDev<BufCpu<TElem, TDim, TIdx>, DevGenericSycl<TPltf>>
     {
         ALPAKA_FN_HOST static auto getPtrDev(
             BufCpu<TElem, TDim, TIdx> const& buf,
-            experimental::DevGenericSycl<TPltf> const& dev) -> TElem const*
+            DevGenericSycl<TPltf> const& dev) -> TElem const*
         {
             return getPtrNative(buf);
         }
         ALPAKA_FN_HOST static auto getPtrDev(
             BufCpu<TElem, TDim, TIdx>& buf,
-            experimental::DevGenericSycl<TPltf> const& dev) -> TElem*
+            DevGenericSycl<TPltf> const& dev) -> TElem*
         {
             return getPtrNative(buf);
         }

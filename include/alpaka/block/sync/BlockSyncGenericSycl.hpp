@@ -15,7 +15,7 @@
 
 #    include <CL/sycl.hpp>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     //! The SYCL block synchronization.
     template<typename TDim>
@@ -30,23 +30,23 @@ namespace alpaka::experimental
 
         sycl::nd_item<TDim::value> my_item;
     };
-} // namespace alpaka::experimental
+} // namespace alpaka
 
 namespace alpaka::trait
 {
     template<typename TDim>
-    struct SyncBlockThreads<experimental::BlockSyncGenericSycl<TDim>>
+    struct SyncBlockThreads<BlockSyncGenericSycl<TDim>>
     {
-        static auto syncBlockThreads(experimental::BlockSyncGenericSycl<TDim> const& blockSync) -> void
+        static auto syncBlockThreads(BlockSyncGenericSycl<TDim> const& blockSync) -> void
         {
             blockSync.my_item.barrier();
         }
     };
 
     template<typename TDim>
-    struct SyncBlockThreadsPredicate<BlockCount, experimental::BlockSyncGenericSycl<TDim>>
+    struct SyncBlockThreadsPredicate<BlockCount, BlockSyncGenericSycl<TDim>>
     {
-        static auto syncBlockThreadsPredicate(experimental::BlockSyncGenericSycl<TDim> const& blockSync, int predicate)
+        static auto syncBlockThreadsPredicate(BlockSyncGenericSycl<TDim> const& blockSync, int predicate)
             -> int
         {
             auto const group = blockSync.my_item.get_group();
@@ -58,9 +58,9 @@ namespace alpaka::trait
     };
 
     template<typename TDim>
-    struct SyncBlockThreadsPredicate<BlockAnd, experimental::BlockSyncGenericSycl<TDim>>
+    struct SyncBlockThreadsPredicate<BlockAnd, BlockSyncGenericSycl<TDim>>
     {
-        static auto syncBlockThreadsPredicate(experimental::BlockSyncGenericSycl<TDim> const& blockSync, int predicate)
+        static auto syncBlockThreadsPredicate(BlockSyncGenericSycl<TDim> const& blockSync, int predicate)
             -> int
         {
             auto const group = blockSync.my_item.get_group();
@@ -71,9 +71,9 @@ namespace alpaka::trait
     };
 
     template<typename TDim>
-    struct SyncBlockThreadsPredicate<BlockOr, experimental::BlockSyncGenericSycl<TDim>>
+    struct SyncBlockThreadsPredicate<BlockOr, BlockSyncGenericSycl<TDim>>
     {
-        static auto syncBlockThreadsPredicate(experimental::BlockSyncGenericSycl<TDim> const& blockSync, int predicate)
+        static auto syncBlockThreadsPredicate(BlockSyncGenericSycl<TDim> const& blockSync, int predicate)
             -> int
         {
             auto const group = blockSync.my_item.get_group();

@@ -14,9 +14,9 @@
 #    include <alpaka/dev/DevFpgaSyclXilinx.hpp>
 #    include <alpaka/event/EventGenericSycl.hpp>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     using EventFpgaSyclXilinx = EventGenericSycl<DevFpgaSyclXilinx>;
-} // namespace alpaka::experimental
+} // namespace alpaka
 
 #endif

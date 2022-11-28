@@ -20,7 +20,7 @@
 
 #include <type_traits>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     namespace internal
     {
@@ -268,4 +268,4 @@ namespace alpaka::experimental
             }
         };
     } // namespace trait
-} // namespace alpaka::experimental
+} // namespace alpaka

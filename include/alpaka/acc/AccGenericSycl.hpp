@@ -45,7 +45,7 @@
 #    include <string>
 #    include <type_traits>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     //! The SYCL accelerator.
     //!
@@ -118,7 +118,7 @@ namespace alpaka::experimental
         }
 #    endif
     };
-} // namespace alpaka::experimental
+} // namespace alpaka
 
 namespace alpaka::trait
 {
@@ -126,7 +126,7 @@ namespace alpaka::trait
     template<template<typename, typename> typename TAcc, typename TDim, typename TIdx>
     struct AccType<
         TAcc<TDim, TIdx>,
-        std::enable_if_t<std::is_base_of_v<experimental::AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
+        std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
     {
         using type = TAcc<TDim, TIdx>;
     };
@@ -135,7 +135,7 @@ namespace alpaka::trait
     template<template<typename, typename> typename TAcc, typename TDim, typename TIdx>
     struct GetAccDevProps<
         TAcc<TDim, TIdx>,
-        std::enable_if_t<std::is_base_of_v<experimental::AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
+        std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
     {
         static auto getAccDevProps(typename DevType<TAcc<TDim, TIdx>>::type const& dev) -> AccDevProps<TDim, TIdx>
         {
@@ -171,7 +171,7 @@ namespace alpaka::trait
     template<template<typename, typename> typename TAcc, typename TDim, typename TIdx>
     struct DimType<
         TAcc<TDim, TIdx>,
-        std::enable_if_t<std::is_base_of_v<experimental::AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
+        std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
     {
         using type = TDim;
     };
@@ -180,7 +180,7 @@ namespace alpaka::trait
     template<template<typename, typename> typename TAcc, typename TDim, typename TIdx>
     struct IdxType<
         TAcc<TDim, TIdx>,
-        std::enable_if_t<std::is_base_of_v<experimental::AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
+        std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
     {
         using type = TIdx;
     };

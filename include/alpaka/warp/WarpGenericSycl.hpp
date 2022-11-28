@@ -17,7 +17,7 @@
 
 #    include <cstdint>
 
-namespace alpaka::experimental::warp
+namespace alpaka::warp
 {
     //! The SYCL warp.
     template<typename TDim>
@@ -30,14 +30,14 @@ namespace alpaka::experimental::warp
 
         sycl::nd_item<TDim::value> m_item;
     };
-} // namespace alpaka::experimental::warp
+} // namespace alpaka::warp
 
 namespace alpaka::warp::trait
 {
     template<typename TDim>
-    struct GetSize<experimental::warp::WarpGenericSycl<TDim>>
+    struct GetSize<warp::WarpGenericSycl<TDim>>
     {
-        static auto getSize(experimental::warp::WarpGenericSycl<TDim> const& warp) -> std::int32_t
+        static auto getSize(warp::WarpGenericSycl<TDim> const& warp) -> std::int32_t
         {
             auto const sub_group = warp.m_item.get_sub_group();
             // SYCL sub-groups are always 1D
@@ -46,9 +46,9 @@ namespace alpaka::warp::trait
     };
 
     template<typename TDim>
-    struct Activemask<experimental::warp::WarpGenericSycl<TDim>>
+    struct Activemask<warp::WarpGenericSycl<TDim>>
     {
-        static auto activemask(experimental::warp::WarpGenericSycl<TDim> const& warp) -> std::uint32_t
+        static auto activemask(warp::WarpGenericSycl<TDim> const& warp) -> std::uint32_t
         {
             // SYCL has no way of querying this. Since sub-group functions have to be executed in convergent code
             // regions anyway we return the full mask.
@@ -58,9 +58,9 @@ namespace alpaka::warp::trait
     };
 
     template<typename TDim>
-    struct All<experimental::warp::WarpGenericSycl<TDim>>
+    struct All<warp::WarpGenericSycl<TDim>>
     {
-        static auto all(experimental::warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::int32_t
+        static auto all(warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::int32_t
         {
             auto const sub_group = warp.m_item.get_sub_group();
             return static_cast<std::int32_t>(sycl::all_of_group(sub_group, static_cast<bool>(predicate)));
@@ -68,9 +68,9 @@ namespace alpaka::warp::trait
     };
 
     template<typename TDim>
-    struct Any<experimental::warp::WarpGenericSycl<TDim>>
+    struct Any<warp::WarpGenericSycl<TDim>>
     {
-        static auto any(experimental::warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::int32_t
+        static auto any(warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::int32_t
         {
             auto const sub_group = warp.m_item.get_sub_group();
             return static_cast<std::int32_t>(sycl::any_of_group(sub_group, static_cast<bool>(predicate)));
@@ -78,9 +78,9 @@ namespace alpaka::warp::trait
     };
 
     template<typename TDim>
-    struct Ballot<experimental::warp::WarpGenericSycl<TDim>>
+    struct Ballot<warp::WarpGenericSycl<TDim>>
     {
-        static auto ballot(experimental::warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate)
+        static auto ballot(warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate)
         {
             auto const sub_group = warp.m_item.get_sub_group();
             return sycl::ext::oneapi::group_ballot(sub_group, static_cast<bool>(predicate));
@@ -88,11 +88,11 @@ namespace alpaka::warp::trait
     };
 
     template<typename TDim>
-    struct Shfl<experimental::warp::WarpGenericSycl<TDim>>
+    struct Shfl<warp::WarpGenericSycl<TDim>>
     {
         template<typename T>
         static auto shfl(
-            experimental::warp::WarpGenericSycl<TDim> const& warp,
+            warp::WarpGenericSycl<TDim> const& warp,
             T value,
             std::int32_t srcLane,
             std::int32_t width)

@@ -19,7 +19,7 @@
 
 #    include <string>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     namespace detail
     {
@@ -52,15 +52,15 @@ namespace alpaka::experimental
 
         using selector = detail::IntelCpuSelector;
     };
-} // namespace alpaka::experimental
+} // namespace alpaka
 
 namespace alpaka::trait
 {
     //! The SYCL device manager device type trait specialization.
     template<>
-    struct DevType<experimental::PltfCpuSyclIntel>
+    struct DevType<PltfCpuSyclIntel>
     {
-        using type = experimental::DevGenericSycl<experimental::PltfCpuSyclIntel>; // = DevCpuSyclIntel
+        using type = DevGenericSycl<PltfCpuSyclIntel>; // = DevCpuSyclIntel
     };
 } // namespace alpaka::trait
 

@@ -20,7 +20,7 @@
 
 #    include <string>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     //! The SYCL device manager.
     class PltfFpgaSyclIntel : public PltfGenericSycl
@@ -34,15 +34,15 @@ namespace alpaka::experimental
         using selector = sycl::ext::intel::fpga_selector;
 #    endif
     };
-} // namespace alpaka::experimental
+} // namespace alpaka
 
 namespace alpaka::trait
 {
     //! The SYCL device manager device type trait specialization.
     template<>
-    struct DevType<experimental::PltfFpgaSyclIntel>
+    struct DevType<PltfFpgaSyclIntel>
     {
-        using type = experimental::DevGenericSycl<experimental::PltfFpgaSyclIntel>; // = DevFpgaSyclIntel
+        using type = DevGenericSycl<PltfFpgaSyclIntel>; // = DevFpgaSyclIntel
     };
 } // namespace alpaka::trait
 

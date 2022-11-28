@@ -29,7 +29,7 @@
 #    include <memory>
 #    include <type_traits>
 
-namespace alpaka::experimental::detail
+namespace alpaka::detail
 {
     //!  The Sycl device memory copy task base.
     template<typename TDim, typename TViewDst, typename TViewSrc, typename TExtent>
@@ -141,20 +141,20 @@ namespace alpaka::experimental::detail
         void* m_dstMemNative;
         void const* m_srcMemNative;
     };
-} // namespace alpaka::experimental::detail
+} // namespace alpaka::detail
 
 // Trait specializations for CreateTaskMemcpy.
 namespace alpaka::trait
 {
     //! The SYCL host-to-device memory copy trait specialization.
     template<typename TPltf, typename TDim>
-    struct CreateTaskMemcpy<TDim, experimental::DevGenericSycl<TPltf>, DevCpu>
+    struct CreateTaskMemcpy<TDim, DevGenericSycl<TPltf>, DevCpu>
     {
         template<typename TExtent, typename TViewSrc, typename TViewDstFwd>
         ALPAKA_FN_HOST static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
-            TExtent const& extent) -> alpaka::experimental::detail::
+            TExtent const& extent) -> alpaka::detail::
             TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
@@ -165,13 +165,13 @@ namespace alpaka::trait
 
     //! The SYCL device-to-host memory copy trait specialization.
     template<typename TPltf, typename TDim>
-    struct CreateTaskMemcpy<TDim, DevCpu, experimental::DevGenericSycl<TPltf>>
+    struct CreateTaskMemcpy<TDim, DevCpu, DevGenericSycl<TPltf>>
     {
         template<typename TExtent, typename TViewSrc, typename TViewDstFwd>
         ALPAKA_FN_HOST static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
-            TExtent const& extent) -> alpaka::experimental::detail::
+            TExtent const& extent) -> alpaka::detail::
             TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
@@ -182,13 +182,13 @@ namespace alpaka::trait
 
     //! The SYCL device-to-device memory copy trait specialization.
     template<typename TPltfDst, typename TPltfSrc, typename TDim>
-    struct CreateTaskMemcpy<TDim, experimental::DevGenericSycl<TPltfDst>, experimental::DevGenericSycl<TPltfSrc>>
+    struct CreateTaskMemcpy<TDim, DevGenericSycl<TPltfDst>, DevGenericSycl<TPltfSrc>>
     {
         template<typename TExtent, typename TViewSrc, typename TViewDstFwd>
         ALPAKA_FN_HOST static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
-            TExtent const& extent) -> alpaka::experimental::detail::
+            TExtent const& extent) -> alpaka::detail::
             TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
@@ -200,12 +200,12 @@ namespace alpaka::trait
     //! The SYCL non-blocking device queue scalar copy enqueue trait specialization.
     template<typename TPltf, typename TExtent, typename TViewSrc, typename TViewDst>
     struct Enqueue<
-        alpaka::experimental::QueueGenericSyclNonBlocking<TPltf>,
-        alpaka::experimental::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent>>
+        alpaka::QueueGenericSyclNonBlocking<TPltf>,
+        alpaka::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent>>
     {
         ALPAKA_FN_HOST static auto enqueue(
-            alpaka::experimental::QueueGenericSyclNonBlocking<TPltf>& queue,
-            alpaka::experimental::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent> const& task) -> void
+            alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
+            alpaka::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent> const& task) -> void
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
 
@@ -216,12 +216,12 @@ namespace alpaka::trait
     //! The SYCL blocking device queue scalar copy enqueue trait specialization.
     template<typename TPltf, typename TExtent, typename TViewSrc, typename TViewDst>
     struct Enqueue<
-        alpaka::experimental::QueueGenericSyclBlocking<TPltf>,
-        alpaka::experimental::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent>>
+        alpaka::QueueGenericSyclBlocking<TPltf>,
+        alpaka::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent>>
     {
         ALPAKA_FN_HOST static auto enqueue(
-            alpaka::experimental::QueueGenericSyclBlocking<TPltf>& queue,
-            alpaka::experimental::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent> const& task) -> void
+            alpaka::QueueGenericSyclBlocking<TPltf>& queue,
+            alpaka::detail::TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent> const& task) -> void
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
 
@@ -233,12 +233,12 @@ namespace alpaka::trait
     //! The SYCL non-blocking device queue 1D copy enqueue trait specialization.
     template<typename TPltf, typename TExtent, typename TViewSrc, typename TViewDst>
     struct Enqueue<
-        alpaka::experimental::QueueGenericSyclNonBlocking<TPltf>,
-        alpaka::experimental::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent>>
+        alpaka::QueueGenericSyclNonBlocking<TPltf>,
+        alpaka::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent>>
     {
         ALPAKA_FN_HOST static auto enqueue(
-            alpaka::experimental::QueueGenericSyclNonBlocking<TPltf>& queue,
-            alpaka::experimental::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent> const& task) -> void
+            alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
+            alpaka::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent> const& task) -> void
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
 
@@ -249,12 +249,12 @@ namespace alpaka::trait
     //! The SYCL blocking device queue 1D copy enqueue trait specialization.
     template<typename TPltf, typename TExtent, typename TViewSrc, typename TViewDst>
     struct Enqueue<
-        alpaka::experimental::QueueGenericSyclBlocking<TPltf>,
-        alpaka::experimental::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent>>
+        alpaka::QueueGenericSyclBlocking<TPltf>,
+        alpaka::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent>>
     {
         ALPAKA_FN_HOST static auto enqueue(
-            alpaka::experimental::QueueGenericSyclBlocking<TPltf>& queue,
-            alpaka::experimental::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent> const& task) -> void
+            alpaka::QueueGenericSyclBlocking<TPltf>& queue,
+            alpaka::detail::TaskCopySycl<DimInt<1u>, TViewDst, TViewSrc, TExtent> const& task) -> void
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
 

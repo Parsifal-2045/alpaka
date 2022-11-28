@@ -23,7 +23,7 @@
 #    include <stdexcept>
 #    include <vector>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     //! The SYCL device manager.
     class PltfGenericSycl : public concepts::Implements<ConceptPltf, PltfGenericSycl>
@@ -31,13 +31,13 @@ namespace alpaka::experimental
     public:
         PltfGenericSycl() = delete;
     };
-} // namespace alpaka::experimental
+} // namespace alpaka
 
 namespace alpaka::trait
 {
     //! The SYCL platform device count get trait specialization.
     template<typename TPltf>
-    struct GetDevCount<TPltf, std::enable_if_t<std::is_base_of_v<experimental::PltfGenericSycl, TPltf>>>
+    struct GetDevCount<TPltf, std::enable_if_t<std::is_base_of_v<PltfGenericSycl, TPltf>>>
     {
         static auto getDevCount() -> std::size_t
         {
@@ -56,7 +56,7 @@ namespace alpaka::trait
 
     //! The SYCL platform device get trait specialization.
     template<typename TPltf>
-    struct GetDevByIdx<TPltf, std::enable_if_t<std::is_base_of_v<experimental::PltfGenericSycl, TPltf>>>
+    struct GetDevByIdx<TPltf, std::enable_if_t<std::is_base_of_v<PltfGenericSycl, TPltf>>>
     {
         static auto getDevByIdx(std::size_t const& devIdx)
         {

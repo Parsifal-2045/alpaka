@@ -14,7 +14,7 @@
 #    include <alpaka/dev/DevFpgaSyclXilinx.hpp>
 #    include <alpaka/queue/QueueGenericSyclBlocking.hpp>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     using QueueFpgaSyclXilinxBlocking = QueueGenericSyclBlocking<DevFpgaSyclXilinx>;
 }

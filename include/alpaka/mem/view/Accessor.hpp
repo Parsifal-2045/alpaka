@@ -23,7 +23,7 @@
 
 #include <tuple>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     //! Access tag type indicating read-only access.
     struct ReadAccess
@@ -170,4 +170,4 @@ namespace alpaka::experimental
         TIdx,
         TDim,
         TAccessModes>;
-} // namespace alpaka::experimental
+} // namespace alpaka

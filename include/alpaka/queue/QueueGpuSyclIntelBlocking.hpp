@@ -14,7 +14,7 @@
 #    include <alpaka/dev/DevGpuSyclIntel.hpp>
 #    include <alpaka/queue/QueueGenericSyclBlocking.hpp>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     using QueueGpuSyclIntelBlocking = QueueGenericSyclBlocking<DevGpuSyclIntel>;
 }

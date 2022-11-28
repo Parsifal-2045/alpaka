@@ -22,7 +22,7 @@
 #    include <cstdint>
 #    include <type_traits>
 
-namespace alpaka::experimental
+namespace alpaka
 {
     //! The SYCL accelerator atomic ops.
     //
@@ -32,7 +32,7 @@ namespace alpaka::experimental
     {
     };
 
-    namespace detail
+    namespace trait::detail
     {
         template<typename THierarchy>
         struct SyclMemoryScope
@@ -98,88 +98,7 @@ namespace alpaka::experimental
                 return op(ref);
             }
         }
-    } // namespace detail
-} // namespace alpaka::experimental
 
-namespace alpaka::trait
-{
-    // Add.
-    //! The SYCL accelerator atomic operation.
-    template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicAdd, experimental::AtomicGenericSycl, T, THierarchy>
-    {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
-
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
-        {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.fetch_add(value); });
-        }
-    };
-
-    // Sub.
-    //! The SYCL accelerator atomic operation.
-    template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicSub, experimental::AtomicGenericSycl, T, THierarchy>
-    {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
-
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
-        {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.fetch_sub(value); });
-        }
-    };
-
-    // Min.
-    //! The SYCL accelerator atomic operation.
-    template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicMin, experimental::AtomicGenericSycl, T, THierarchy>
-    {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
-
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
-        {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.fetch_min(value); });
-        }
-    };
-
-    // Max.
-    //! The SYCL accelerator atomic operation.
-    template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicMax, experimental::AtomicGenericSycl, T, THierarchy>
-    {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
-
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
-        {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.fetch_max(value); });
-        }
-    };
-
-    // Exch.
-    //! The SYCL accelerator atomic operation.
-    template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicExch, experimental::AtomicGenericSycl, T, THierarchy>
-    {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
-
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
-        {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.exchange(value); });
-        }
-    };
-
-    namespace detail
-    {
         template<typename TRef, typename T, typename TEval>
         inline auto casWithCondition(T* const addr, TEval&& eval)
         {
@@ -198,97 +117,158 @@ namespace alpaka::trait
 
             return old_val;
         }
-    } // namespace detail
+    } // namespace trait::detail
+} // namespace alpaka
+
+namespace alpaka::trait
+{
+    // Add.
+    //! The SYCL accelerator atomic operation.
+    template<typename T, typename THierarchy>
+    struct AtomicOp<AtomicAdd, AtomicGenericSycl, T, THierarchy>
+    {
+        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
+
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        {
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_add(value); });
+        }
+    };
+
+    // Sub.
+    //! The SYCL accelerator atomic operation.
+    template<typename T, typename THierarchy>
+    struct AtomicOp<AtomicSub, AtomicGenericSycl, T, THierarchy>
+    {
+        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
+
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        {
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_sub(value); });
+        }
+    };
+
+    // Min.
+    //! The SYCL accelerator atomic operation.
+    template<typename T, typename THierarchy>
+    struct AtomicOp<AtomicMin, AtomicGenericSycl, T, THierarchy>
+    {
+        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
+
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        {
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_min(value); });
+        }
+    };
+
+    // Max.
+    //! The SYCL accelerator atomic operation.
+    template<typename T, typename THierarchy>
+    struct AtomicOp<AtomicMax, AtomicGenericSycl, T, THierarchy>
+    {
+        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
+
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        {
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_max(value); });
+        }
+    };
+
+    // Exch.
+    //! The SYCL accelerator atomic operation.
+    template<typename T, typename THierarchy>
+    struct AtomicOp<AtomicExch, AtomicGenericSycl, T, THierarchy>
+    {
+        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
+
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        {
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.exchange(value); });
+        }
+    };
 
     // Inc.
     //! The SYCL accelerator atomic operation.
     template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicInc, experimental::AtomicGenericSycl, T, THierarchy>
+    struct AtomicOp<AtomicInc, AtomicGenericSycl, T, THierarchy>
     {
         static_assert(std::is_unsigned_v<T>, "atomicInc only supported for unsigned types");
 
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
             auto inc = [&value](auto old_val) { return (old_val >= value) ? static_cast<T>(0) : (old_val + 1u); };
             if(auto ptr = get_global_ptr(addr); ptr != nullptr)
-                return detail::casWithCondition<experimental::detail::global_ref<T, THierarchy>>(addr, inc);
+                return detail::casWithCondition<detail::global_ref<T, THierarchy>>(addr, inc);
             else
-                return detail::casWithCondition<experimental::detail::local_ref<T, THierarchy>>(addr, inc);
+                return detail::casWithCondition<detail::local_ref<T, THierarchy>>(addr, inc);
         }
     };
 
     // Dec.
     //! The SYCL accelerator atomic operation.
     template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicDec, experimental::AtomicGenericSycl, T, THierarchy>
+    struct AtomicOp<AtomicDec, AtomicGenericSycl, T, THierarchy>
     {
         static_assert(std::is_unsigned_v<T>, "atomicDec only supported for unsigned types");
 
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
             auto dec
                 = [&value](auto& old_val) { return ((old_val == 0) || (old_val > value)) ? value : (old_val - 1u); };
             if(auto ptr = get_global_ptr(addr); ptr != nullptr)
-                return detail::casWithCondition<experimental::detail::global_ref<T, THierarchy>>(addr, dec);
+                return detail::casWithCondition<detail::global_ref<T, THierarchy>>(addr, dec);
             else
-                return detail::casWithCondition<experimental::detail::local_ref<T, THierarchy>>(addr, dec);
+                return detail::casWithCondition<detail::local_ref<T, THierarchy>>(addr, dec);
         }
     };
 
     // And.
     //! The SYCL accelerator atomic operation.
     template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicAnd, experimental::AtomicGenericSycl, T, THierarchy>
+    struct AtomicOp<AtomicAnd, AtomicGenericSycl, T, THierarchy>
     {
         static_assert(std::is_integral_v<T>, "Bitwise operations only supported for integral types.");
 
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.fetch_and(value); });
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_and(value); });
         }
     };
 
     // Or.
     //! The SYCL accelerator atomic operation.
     template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicOr, experimental::AtomicGenericSycl, T, THierarchy>
+    struct AtomicOp<AtomicOr, AtomicGenericSycl, T, THierarchy>
     {
         static_assert(std::is_integral_v<T>, "Bitwise operations only supported for integral types.");
 
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.fetch_or(value); });
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_or(value); });
         }
     };
 
     // Xor.
     //! The SYCL accelerator atomic operation.
     template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicXor, experimental::AtomicGenericSycl, T, THierarchy>
+    struct AtomicOp<AtomicXor, AtomicGenericSycl, T, THierarchy>
     {
         static_assert(std::is_integral_v<T>, "Bitwise operations only supported for integral types.");
 
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& value) -> T
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return experimental::detail::callAtomicOp<THierarchy>(
-                addr,
-                [&value](auto& ref) { return ref.fetch_xor(value); });
+            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_xor(value); });
         }
     };
 
     // Cas.
     //! The SYCL accelerator atomic operation.
     template<typename T, typename THierarchy>
-    struct AtomicOp<AtomicCas, experimental::AtomicGenericSycl, T, THierarchy>
+    struct AtomicOp<AtomicCas, AtomicGenericSycl, T, THierarchy>
     {
         static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
 
-        static auto atomicOp(experimental::AtomicGenericSycl const&, T* const addr, T const& compare, T const& value)
-            -> T
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& compare, T const& value) -> T
         {
             auto cas = [&compare, &value](auto& ref)
             {
@@ -308,12 +288,12 @@ namespace alpaka::trait
 
             if(auto ptr = get_global_ptr(addr); ptr != nullptr)
             {
-                auto ref = experimental::detail::global_ref<T, THierarchy>{*addr};
+                auto ref = detail::global_ref<T, THierarchy>{*addr};
                 return cas(ref);
             }
             else
             {
-                auto ref = experimental::detail::local_ref<T, THierarchy>{*addr};
+                auto ref = detail::local_ref<T, THierarchy>{*addr};
                 return cas(ref);
             }
         }
