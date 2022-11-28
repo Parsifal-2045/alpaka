@@ -7,6 +7,7 @@
 #ifdef ALPAKA_ACC_SYCL_ENABLED
 
 #    include <alpaka/acc/Traits.hpp>
+#    include <alpaka/block/shared/dyn/BlockSharedDynMemberAllocKiB.hpp>
 #    include <alpaka/core/BoostPredef.hpp>
 #    include <alpaka/core/STLTuple/STLTuple.hpp>
 #    include <alpaka/core/Sycl.hpp>
@@ -48,9 +49,8 @@ namespace alpaka::detail
     template<typename TElem, typename TIdx, std::size_t TDim, typename TAccessModes>
     inline auto require(
         sycl::handler& cgh,
-        experimental::
-            Accessor<detail::SyclAccessor<TElem, DimInt<TDim>::value, TAccessModes>, TElem, TIdx, TDim, TAccessModes>
-                acc,
+        experimental::Accessor<SyclAccessor<TElem, DimInt<TDim>::value, TAccessModes>, TElem, TIdx, TDim, TAccessModes>
+            acc,
         special)
     {
         cgh.require(acc.m_accessor);
@@ -142,7 +142,8 @@ namespace alpaka
 
             auto output_stream = sycl::stream{buf_size, buf_per_work_item, cgh};
 #    endif
-            cgh.parallel_for<detail::kernel<TAcc, TKernelFnObj, TArgs...>>(
+            // cgh.parallel_for<detail::kernel<TAcc, TKernelFnObj, TArgs...>>( //FIXME_
+            cgh.parallel_for(
                 sycl::nd_range<TDim::value>{global_size, local_size},
                 [=](sycl::nd_item<TDim::value> work_item)
                 {

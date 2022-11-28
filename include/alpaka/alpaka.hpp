@@ -177,6 +177,7 @@
 #include <alpaka/meta/IsStrictBase.hpp>
 #include <alpaka/meta/NdLoop.hpp>
 #include <alpaka/meta/Set.hpp>
+#include <alpaka/meta/SyclPrintf.hpp>
 #include <alpaka/meta/Transform.hpp>
 #include <alpaka/meta/TypeListOps.hpp>
 // offset
@@ -192,6 +193,7 @@
 #include <alpaka/pltf/Traits.hpp>
 // rand
 #include <alpaka/rand/RandDefault.hpp>
+#include <alpaka/rand/RandGenericSycl.hpp>
 #include <alpaka/rand/RandPhilox.hpp>
 #include <alpaka/rand/RandStdLib.hpp>
 #include <alpaka/rand/RandUniformCudaHipRand.hpp>

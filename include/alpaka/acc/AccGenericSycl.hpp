@@ -18,6 +18,8 @@
 #    include <alpaka/intrinsic/IntrinsicGenericSycl.hpp>
 #    include <alpaka/math/MathGenericSycl.hpp>
 #    include <alpaka/mem/fence/MemFenceGenericSycl.hpp>
+#    include <alpaka/meta/SyclPrintf.hpp>
+#    include <alpaka/rand/RandGenericSycl.hpp>
 #    include <alpaka/warp/WarpGenericSycl.hpp>
 #    include <alpaka/workdiv/WorkDivGenericSycl.hpp>
 
@@ -57,6 +59,7 @@ namespace alpaka
         , public BlockSyncGenericSycl<TDim>
         , public IntrinsicGenericSycl
         , public MemFenceGenericSycl
+        , public rand::RandGenericSycl
         , public warp::WarpGenericSycl<TDim>
     {
     public:
@@ -84,6 +87,7 @@ namespace alpaka
             , BlockSyncGenericSycl<TDim>{work_item}
             , IntrinsicGenericSycl{}
             , MemFenceGenericSycl{global_fence_dummy, local_fence_dummy}
+            , rand::RandGenericSycl{}
             , warp::WarpGenericSycl<TDim>{work_item}
             , cout{output_stream}
         {
@@ -133,7 +137,11 @@ namespace alpaka::trait
         static auto getAccDevProps(typename DevType<TAcc<TDim, TIdx>>::type const& dev) -> AccDevProps<TDim, TIdx>
         {
             auto const device = dev.getNativeHandle().first;
-            auto max_threads_dim = device.template get_info<sycl::info::device::max_work_item_sizes>();
+            auto const max_threads_dim
+                = device.template get_info<sycl::info::device::max_work_item_sizes<TDim::value>>();
+            Vec<TDim, TIdx> max_threads_dim_vec{};
+            for(int i = 0; i < TDim::value; i++)
+                max_threads_dim_vec[i] = alpaka::core::clipCast<TIdx>(max_threads_dim[i]);
             return {// m_multiProcessorCount
                     alpaka::core::clipCast<TIdx>(device.template get_info<sycl::info::device::max_compute_units>()),
                     // m_gridBlockExtentMax
@@ -145,10 +153,7 @@ namespace alpaka::trait
                     // m_gridBlockCountMax
                     std::numeric_limits<TIdx>::max(),
                     // m_blockThreadExtentMax
-                    getExtentVecEnd<TDim>(Vec<DimInt<3u>, TIdx>(
-                        alpaka::core::clipCast<TIdx>(max_threads_dim[2u]),
-                        alpaka::core::clipCast<TIdx>(max_threads_dim[1u]),
-                        alpaka::core::clipCast<TIdx>(max_threads_dim[0u]))),
+                    max_threads_dim_vec,
                     // m_blockThreadCountMax
                     alpaka::core::clipCast<TIdx>(device.template get_info<sycl::info::device::max_work_group_size>()),
                     // m_threadElemExtentMax
