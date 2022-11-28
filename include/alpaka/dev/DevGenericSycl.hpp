@@ -219,7 +219,7 @@ namespace alpaka::trait
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
     struct BufType<DevGenericSycl<TPltf>, TElem, TDim, TIdx>
     {
-        using type = BufGenericSycl<TElem, TDim, TIdx, DevGenericSycl<TPltf>>;
+        using type = BufGenericSycl<TElem, TDim, TIdx, TPltf>;
     };
 
     //! The SYCL device platform type trait specialization.

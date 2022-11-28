@@ -115,7 +115,7 @@ namespace alpaka::detail
     template<typename TViewDst, typename TViewSrc, typename TExtent>
     struct TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent>
     {
-        using Elem = alpaka::Elem<TViewSrc>; // FIXME_ Src on CPU, Dst on CUDA?
+        using Elem = alpaka::Elem<TViewSrc>;
 
         template<typename TViewDstFwd>
         ALPAKA_FN_HOST TaskCopySycl(
@@ -154,8 +154,8 @@ namespace alpaka::trait
         ALPAKA_FN_HOST static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
-            TExtent const& extent) -> alpaka::detail::
-            TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
+            TExtent const& extent)
+            -> alpaka::detail::TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
 
@@ -171,8 +171,8 @@ namespace alpaka::trait
         ALPAKA_FN_HOST static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
-            TExtent const& extent) -> alpaka::detail::
-            TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
+            TExtent const& extent)
+            -> alpaka::detail::TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
 
@@ -188,8 +188,8 @@ namespace alpaka::trait
         ALPAKA_FN_HOST static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
-            TExtent const& extent) -> alpaka::detail::
-            TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
+            TExtent const& extent)
+            -> alpaka::detail::TaskCopySycl<TDim, std::remove_reference_t<TViewDstFwd>, TViewSrc, TExtent>
         {
             ALPAKA_DEBUG_FULL_LOG_SCOPE;
 
