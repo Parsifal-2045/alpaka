@@ -12,6 +12,7 @@
 #ifdef ALPAKA_ACC_SYCL_ENABLED
 
 #    include <alpaka/acc/Traits.hpp>
+#    include <alpaka/block/shared/dyn/BlockSharedDynMemberAllocKiB.hpp>
 #    include <alpaka/core/BoostPredef.hpp>
 #    include <alpaka/core/STLTuple/STLTuple.hpp>
 #    include <alpaka/core/Sycl.hpp>
@@ -121,7 +122,9 @@ namespace alpaka::experimental
                 cgh};
 
             // register memory fence dummies
-            auto global_fence_dummy = global_fence_buf.get_access(cgh); // Exists once per queue
+            auto global_fence_dummy
+                = global_fence_buf.get_access<sycl::access_mode::read_write, sycl::target::global_buffer>(
+                    cgh); // Exists once per queue
             auto local_fence_dummy
                 = sycl::accessor<int, 1, sycl::access_mode::read_write, sycl::target::local>{sycl::range<1>{1}, cgh};
 

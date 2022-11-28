@@ -135,6 +135,16 @@ namespace alpaka::experimental
             return std::make_pair(m_impl->get_device(), m_impl->get_context());
         }
 
+        auto get_device() const -> sycl::device
+        {
+            return m_impl->get_device();
+        }
+
+        auto get_context() const -> sycl::context
+        {
+            return m_impl->get_context();
+        }
+
         std::shared_ptr<detail::DevGenericSyclImpl> m_impl;
     };
 } // namespace alpaka::experimental

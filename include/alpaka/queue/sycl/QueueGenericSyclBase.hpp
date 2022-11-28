@@ -15,6 +15,7 @@
 #    include <alpaka/event/Traits.hpp>
 #    include <alpaka/queue/Traits.hpp>
 #    include <alpaka/wait/Traits.hpp>
+#    include <alpaka/traits/Traits.hpp>
 
 #    include <CL/sycl.hpp>
 

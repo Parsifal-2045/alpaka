@@ -161,7 +161,7 @@ namespace alpaka::trait
     };
 
     //! The SYCL device event native handle trait specialization.
-    template<TDev>
+    template<typename TDev>
     struct NativeHandle<experimental::EventGenericSycl<TDev>>
     {
         [[nodiscard]] static auto getNativeHandle(experimental::EventGenericSycl<TDev> const& event)

@@ -93,6 +93,8 @@ auto main() -> int
     using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
     std::cout << "Using alpaka accelerator: " << alpaka::getAccName<Acc>() << std::endl;
 
+    using Pltf = alpaka::experimental::PltfGpuSyclIntel;
+    
     // Defines the synchronization behavior of a queue
     //
     // choose between Blocking and NonBlocking
@@ -149,7 +151,7 @@ auto main() -> int
     }
 
     // Allocate 3 buffers on the accelerator
-    using BufAcc = alpaka::Buf<Acc, Data, Dim, Idx>;
+    using BufAcc = alpaka::experimental::BufGenericSycl<Data, Dim, Idx, Pltf>;
     BufAcc bufAccA(alpaka::allocBuf<Data, Idx>(devAcc, extent));
     BufAcc bufAccB(alpaka::allocBuf<Data, Idx>(devAcc, extent));
     BufAcc bufAccC(alpaka::allocBuf<Data, Idx>(devAcc, extent));
