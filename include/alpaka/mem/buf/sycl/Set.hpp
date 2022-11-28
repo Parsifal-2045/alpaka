@@ -19,6 +19,8 @@
 #    include <alpaka/extent/Traits.hpp>
 #    include <alpaka/mem/buf/sycl/Common.hpp>
 #    include <alpaka/mem/view/Traits.hpp>
+#    include <alpaka/queue/QueueGenericSyclBlocking.hpp>
+#    include <alpaka/queue/QueueGenericSyclNonBlocking.hpp>
 #    include <alpaka/queue/Traits.hpp>
 
 #    include <CL/sycl.hpp>
@@ -31,29 +33,88 @@ namespace alpaka
 {
     namespace detail
     {
-        template<std::size_t TDim>
-        using Accessor = sycl::accessor<
-            std::byte,
-            TDim,
-            sycl::access_mode::write,
-            sycl::target::global_buffer,
-            sycl::access::placeholder::true_t>;
-
-        //! The SYCL memory set trait.
-        template<typename TAccessor>
-        struct TaskSetSycl
+        //!  The SYCL memory set task base.
+        template<typename TDim, typename TView, typename TExtent>
+        struct TaskSetSyclBase
         {
-            auto operator()(sycl::handler& cgh) const -> void
+            using ExtentSize = Idx<TExtent>;
+            using DstSize = Idx<TView>;
+            using Elem = alpaka::Elem<TView>;
+
+            TaskSetSyclBase(TView& view, std::uint8_t const& byte, TExtent const& extent)
+                : m_view(view)
+                , m_byte(byte)
+                , m_extent(extent)
             {
-                cgh.require(m_accessor);
-                cgh.fill(m_accessor, m_value);
             }
 
-            TAccessor m_accessor;
-            std::byte m_value;
-            // Distinguish from non-alpaka types (= host tasks)
-            static constexpr auto is_sycl_task = true;
+        protected:
+            TView& m_view;
+            std::uint8_t const m_byte;
+            TExtent const m_extent;
         };
+
+        //! The SYCL memory set task.
+        template<typename TDim, typename TView, typename TExtent>
+        struct TaskSetSycl;
+
+        //! The scalar SYCL memory set task.
+        template<typename TView, typename TExtent>
+        struct TaskSetSycl<DimInt<0u>, TView, TExtent> : public TaskSetSyclBase<DimInt<0u>, TView, TExtent>
+        {
+            template<typename TViewFwd>
+            TaskSetSycl(TViewFwd&& view, std::uint8_t const& byte, TExtent const& extent)
+                : TaskSetSyclBase<DimInt<0u>, TView, TExtent>(std::forward<TViewFwd>(view), byte, extent)
+            {
+            }
+
+            template<typename TQueue>
+            auto enqueue(TQueue& queue) const -> void
+            {
+                queue.getNativeHandle().memset(
+                    getPtrNative(this->m_view),
+                    static_cast<int>(this->m_byte),
+                    sizeof(Elem<TView>));
+            }
+        };
+
+        //! The 1D SYCL memory set task.
+        template<typename TView, typename TExtent>
+        struct TaskSetSycl<DimInt<1u>, TView, TExtent> : public TaskSetSyclBase<DimInt<1u>, TView, TExtent>
+        {
+            template<typename TViewFwd>
+            TaskSetSycl(TViewFwd&& view, std::uint8_t const& byte, TExtent const& extent)
+                : TaskSetSyclBase<DimInt<1u>, TView, TExtent>(std::forward<TViewFwd>(view), byte, extent)
+            {
+            }
+
+            template<typename TQueue>
+            auto enqueue(TQueue& queue) const -> void
+            {
+                using Idx = Idx<TExtent>;
+
+                auto& view = this->m_view;
+                auto const& extent = this->m_extent;
+
+                auto const extentWidth = getWidth(extent);
+                ALPAKA_ASSERT(extentWidth <= getWidth(view));
+
+                if(extentWidth == 0)
+                {
+                    return;
+                }
+
+                // Initiate the memory set.
+                auto const extentWidthBytes = extentWidth * static_cast<Idx>(sizeof(Elem<TView>));
+
+                queue.getNativeHandle().memset(
+                    getPtrNative(this->m_view),
+                    static_cast<int>(this->m_byte),
+                    static_cast<size_t>(extentWidthBytes));
+            }
+        };
+
+
     } // namespace detail
 
     namespace trait
@@ -62,25 +123,81 @@ namespace alpaka
         template<typename TDim, typename TPltf>
         struct CreateTaskMemset<TDim, DevGenericSycl<TPltf>>
         {
-            template<typename TExtent, typename TViewFwd>
-            static auto createTaskMemset(TViewFwd&& view, std::uint8_t const& byte, TExtent const& ext)
+            template<typename TExtent, typename TView>
+            ALPAKA_FN_HOST static auto createTaskMemset(TView& view, std::uint8_t const& byte, TExtent const& extent)
+                -> alpaka::detail::TaskSetSycl<TDim, TView, TExtent>
             {
-                ALPAKA_DEBUG_FULL_LOG_SCOPE;
-
-                constexpr auto set_dim = static_cast<int>(Dim<TExtent>::value);
-                using TView = std::remove_reference_t<TViewFwd>;
-                using ElemType = Elem<TView>;
-                using DstType = alpaka::detail::Accessor<set_dim>;
-
-                // Reinterpret as byte buffer
-                auto buf = view.m_buffer.template reinterpret<std::byte>();
-                auto const byte_val = static_cast<std::byte>(byte);
-
-                auto const range = ::alpaka::detail::make_sycl_range(ext, sizeof(ElemType));
-                return ::alpaka::detail::TaskSetSycl<DstType>{DstType{buf, range}, byte_val};
+                return alpaka::detail::TaskSetSycl<TDim, TView, TExtent>(view, byte, extent);
             }
         };
-    } // namespace trait
-} // namespace alpaka
 
+        //! The SYCL non-blocking device queue scalar set enqueue trait specialization.
+        template<typename TView, typename TExtent, typename TPltf>
+        struct Enqueue<
+            alpaka::QueueGenericSyclNonBlocking<TPltf>,
+            alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent>>
+        {
+            ALPAKA_FN_HOST static auto enqueue(
+                alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
+                alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent> const& task) -> void
+            {
+                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
+
+                task.enqueue(queue);
+            }
+        };
+
+        //! The SYCL blocking device queue scalar set enqueue trait specialization.
+        template<typename TView, typename TExtent, typename TPltf>
+        struct Enqueue<
+            alpaka::QueueGenericSyclBlocking<TPltf>,
+            alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent>>
+        {
+            ALPAKA_FN_HOST static auto enqueue(
+                alpaka::QueueGenericSyclBlocking<TPltf>& queue,
+                alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent> const& task) -> void
+            {
+                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
+
+                task.enqueue(queue);
+                queue.getNativeHandle().wait();
+            }
+        };
+
+        //! The SYCL non-blocking device queue 1D set enqueue trait specialization.
+        template<typename TView, typename TExtent, typename TPltf>
+        struct Enqueue<
+            alpaka::QueueGenericSyclNonBlocking<TPltf>,
+            alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent>>
+        {
+            ALPAKA_FN_HOST static auto enqueue(
+                alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
+                alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent> const& task) -> void
+            {
+                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
+
+                task.enqueue(queue);
+            }
+        };
+
+        //! The SYCL blocking device queue 1D set enqueue trait specialization.
+        template<typename TView, typename TExtent, typename TPltf>
+        struct Enqueue<
+            alpaka::QueueGenericSyclBlocking<TPltf>,
+            alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent>>
+        {
+            ALPAKA_FN_HOST static auto enqueue(
+                alpaka::QueueGenericSyclBlocking<TPltf>& queue,
+                alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent> const& task) -> void
+            {
+                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
+
+                task.enqueue(queue);
+                queue.getNativeHandle().wait();
+            }
+        };
+
+    } // namespace trait
+
+} // namespace alpaka
 #endif
