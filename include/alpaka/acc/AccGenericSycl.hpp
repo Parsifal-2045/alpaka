@@ -23,6 +23,7 @@
 #    include <alpaka/intrinsic/IntrinsicGenericSycl.hpp>
 #    include <alpaka/math/MathGenericSycl.hpp>
 #    include <alpaka/mem/fence/MemFenceGenericSycl.hpp>
+#    include <alpaka/meta/SyclPrintf.hpp>
 #    include <alpaka/warp/WarpGenericSycl.hpp>
 #    include <alpaka/workdiv/WorkDivGenericSycl.hpp>
 
@@ -124,9 +125,7 @@ namespace alpaka::trait
 {
     //! The SYCL accelerator type trait specialization.
     template<template<typename, typename> typename TAcc, typename TDim, typename TIdx>
-    struct AccType<
-        TAcc<TDim, TIdx>,
-        std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
+    struct AccType<TAcc<TDim, TIdx>, std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
     {
         using type = TAcc<TDim, TIdx>;
     };
@@ -169,18 +168,14 @@ namespace alpaka::trait
 
     //! The SYCL accelerator dimension getter trait specialization.
     template<template<typename, typename> typename TAcc, typename TDim, typename TIdx>
-    struct DimType<
-        TAcc<TDim, TIdx>,
-        std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
+    struct DimType<TAcc<TDim, TIdx>, std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
     {
         using type = TDim;
     };
 
     //! The SYCL accelerator idx type trait specialization.
     template<template<typename, typename> typename TAcc, typename TDim, typename TIdx>
-    struct IdxType<
-        TAcc<TDim, TIdx>,
-        std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
+    struct IdxType<TAcc<TDim, TIdx>, std::enable_if_t<std::is_base_of_v<AccGenericSycl<TDim, TIdx>, TAcc<TDim, TIdx>>>>
     {
         using type = TIdx;
     };
