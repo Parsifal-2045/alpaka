@@ -32,7 +32,7 @@ namespace alpaka
     {
     };
 
-    namespace trait::detail
+    namespace detail
     {
         template<typename THierarchy>
         struct SyclMemoryScope
@@ -117,7 +117,7 @@ namespace alpaka
 
             return old_val;
         }
-    } // namespace trait::detail
+    } // namespace detail
 } // namespace alpaka
 
 namespace alpaka::trait
@@ -131,7 +131,9 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_add(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(
+                addr,
+                [&value](auto& ref) { return ref.fetch_add(value); });
         }
     };
 
@@ -144,7 +146,9 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_sub(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(
+                addr,
+                [&value](auto& ref) { return ref.fetch_sub(value); });
         }
     };
 
@@ -157,7 +161,9 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_min(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(
+                addr,
+                [&value](auto& ref) { return ref.fetch_min(value); });
         }
     };
 
@@ -170,7 +176,9 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_max(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(
+                addr,
+                [&value](auto& ref) { return ref.fetch_max(value); });
         }
     };
 
@@ -183,7 +191,7 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.exchange(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.exchange(value); });
         }
     };
 
@@ -198,9 +206,9 @@ namespace alpaka::trait
         {
             auto inc = [&value](auto old_val) { return (old_val >= value) ? static_cast<T>(0) : (old_val + 1u); };
             if(auto ptr = get_global_ptr(addr); ptr != nullptr)
-                return detail::casWithCondition<detail::global_ref<T, THierarchy>>(addr, inc);
+                return alpaka::detail::casWithCondition<alpaka::detail::global_ref<T, THierarchy>>(addr, inc);
             else
-                return detail::casWithCondition<detail::local_ref<T, THierarchy>>(addr, inc);
+                return alpaka::detail::casWithCondition<alpaka::detail::local_ref<T, THierarchy>>(addr, inc);
         }
     };
 
@@ -216,9 +224,9 @@ namespace alpaka::trait
             auto dec
                 = [&value](auto& old_val) { return ((old_val == 0) || (old_val > value)) ? value : (old_val - 1u); };
             if(auto ptr = get_global_ptr(addr); ptr != nullptr)
-                return detail::casWithCondition<detail::global_ref<T, THierarchy>>(addr, dec);
+                return alpaka::detail::casWithCondition<alpaka::detail::global_ref<T, THierarchy>>(addr, dec);
             else
-                return detail::casWithCondition<detail::local_ref<T, THierarchy>>(addr, dec);
+                return alpaka::detail::casWithCondition<alpaka::detail::local_ref<T, THierarchy>>(addr, dec);
         }
     };
 
@@ -231,7 +239,9 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_and(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(
+                addr,
+                [&value](auto& ref) { return ref.fetch_and(value); });
         }
     };
 
@@ -244,7 +254,7 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_or(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_or(value); });
         }
     };
 
@@ -257,7 +267,9 @@ namespace alpaka::trait
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            return detail::callAtomicOp<THierarchy>(addr, [&value](auto& ref) { return ref.fetch_xor(value); });
+            return alpaka::detail::callAtomicOp<THierarchy>(
+                addr,
+                [&value](auto& ref) { return ref.fetch_xor(value); });
         }
     };
 
@@ -288,12 +300,12 @@ namespace alpaka::trait
 
             if(auto ptr = get_global_ptr(addr); ptr != nullptr)
             {
-                auto ref = detail::global_ref<T, THierarchy>{*addr};
+                auto ref = alpaka::detail::global_ref<T, THierarchy>{*addr};
                 return cas(ref);
             }
             else
             {
-                auto ref = detail::local_ref<T, THierarchy>{*addr};
+                auto ref = alpaka::detail::local_ref<T, THierarchy>{*addr};
                 return cas(ref);
             }
         }

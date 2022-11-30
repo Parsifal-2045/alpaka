@@ -17,7 +17,7 @@
 
 namespace alpaka
 {
-    namespace trait::detail
+    namespace detail
     {
         template<typename TAlpakaMemScope>
         struct SyclFenceProps
@@ -37,7 +37,7 @@ namespace alpaka
             static constexpr auto scope = sycl::memory_scope::device;
             static constexpr auto space = sycl::access::address_space::global_space;
         };
-    } // namespace trait::detail
+    } // namespace detail
 
     //! The SYCL memory fence.
     class MemFenceGenericSycl : public concepts::Implements<ConceptMemFence, MemFenceGenericSycl>

@@ -28,7 +28,7 @@
 #    include <utility>
 #    include <vector>
 
-namespace alpaka::trait
+namespace alpaka
 {
     namespace detail
     {
@@ -201,7 +201,7 @@ namespace alpaka::trait
         std::shared_ptr<detail::QueueGenericSyclImpl> m_impl;
     };
 
-} // namespace alpaka::trait
+} // namespace alpaka
 
 namespace alpaka
 {

@@ -19,7 +19,7 @@
 namespace alpaka
 {
     template<typename TDev>
-    using QueueGenericSyclBlocking = trait::QueueGenericSyclBase<TDev, true>;
+    using QueueGenericSyclBlocking = QueueGenericSyclBase<TDev, true>;
 } // namespace alpaka
 
 #endif

@@ -39,7 +39,7 @@ namespace alpaka
     template<typename TElem, typename TDim, typename TIdx, typename TDev>
     class BufGenericSycl;
 
-    namespace trait::detail
+    namespace detail
     {
         class DevGenericSyclImpl
         {
@@ -116,7 +116,7 @@ namespace alpaka
     {
     public:
         DevGenericSycl(sycl::device device, sycl::context context)
-            : m_impl{std::make_shared<trait::detail::DevGenericSyclImpl>(std::move(device), std::move(context))}
+            : m_impl{std::make_shared<alpaka::detail::DevGenericSyclImpl>(std::move(device), std::move(context))}
         {
         }
 
@@ -145,7 +145,7 @@ namespace alpaka
             return m_impl->get_context();
         }
 
-        std::shared_ptr<trait::detail::DevGenericSyclImpl> m_impl;
+        std::shared_ptr<alpaka::detail::DevGenericSyclImpl> m_impl;
     };
 } // namespace alpaka
 
