@@ -205,7 +205,7 @@ namespace alpaka::trait
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
             auto inc = [&value](auto old_val) { return (old_val >= value) ? static_cast<T>(0) : (old_val + 1u); };
-            if(auto ptr = get_global_ptr(addr); ptr != nullptr)
+            if(auto ptr = alpaka::detail::get_global_ptr(addr); ptr != nullptr)
                 return alpaka::detail::casWithCondition<alpaka::detail::global_ref<T, THierarchy>>(addr, inc);
             else
                 return alpaka::detail::casWithCondition<alpaka::detail::local_ref<T, THierarchy>>(addr, inc);
@@ -223,7 +223,7 @@ namespace alpaka::trait
         {
             auto dec
                 = [&value](auto& old_val) { return ((old_val == 0) || (old_val > value)) ? value : (old_val - 1u); };
-            if(auto ptr = get_global_ptr(addr); ptr != nullptr)
+            if(auto ptr = alpaka::detail::get_global_ptr(addr); ptr != nullptr)
                 return alpaka::detail::casWithCondition<alpaka::detail::global_ref<T, THierarchy>>(addr, dec);
             else
                 return alpaka::detail::casWithCondition<alpaka::detail::local_ref<T, THierarchy>>(addr, dec);
@@ -298,7 +298,7 @@ namespace alpaka::trait
                 return old;
             };
 
-            if(auto ptr = get_global_ptr(addr); ptr != nullptr)
+            if(auto ptr = alpaka::detail::get_global_ptr(addr); ptr != nullptr)
             {
                 auto ref = alpaka::detail::global_ref<T, THierarchy>{*addr};
                 return cas(ref);

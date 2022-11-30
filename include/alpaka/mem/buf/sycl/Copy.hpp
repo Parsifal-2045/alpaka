@@ -37,7 +37,7 @@ namespace alpaka::detail
     struct TaskCopySyclBase
     {
         static_assert(
-            std::is_same_v<alpaka::Elem<TViewSrc>, alpaka::Elem<TViewDst>>,
+            std::is_same_v<std::remove_const<alpaka::Elem<TViewSrc>>, std::remove_const<alpaka::Elem<TViewDst>>>,
             "Source and destination should be of the same type");
             
         using ExtentSize = Idx<TExtent>;
@@ -165,7 +165,7 @@ namespace alpaka::detail
     struct TaskCopySycl<DimInt<0u>, TViewDst, TViewSrc, TExtent>
     {
         static_assert(
-            std::is_same_v<alpaka::Elem<TViewSrc>, alpaka::Elem<TViewDst>>,
+            std::is_same_v<std::remove_const<alpaka::Elem<TViewSrc>>, std::remove_const<alpaka::Elem<TViewDst>>>,
             "Source and destination should be of the same type");
 
         using Elem = alpaka::Elem<TViewSrc>;
