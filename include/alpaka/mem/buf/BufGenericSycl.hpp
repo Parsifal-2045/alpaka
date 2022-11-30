@@ -19,6 +19,7 @@
 #    include <alpaka/mem/buf/BufCpu.hpp>
 #    include <alpaka/mem/buf/Traits.hpp>
 #    include <alpaka/mem/view/Accessor.hpp>
+#    include <alpaka/mem/view/ViewAccessOps.hpp>
 #    include <alpaka/vec/Vec.hpp>
 
 #    include <CL/sycl.hpp>
@@ -30,22 +31,18 @@ namespace alpaka
 {
     //! The SYCL memory buffer.
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    class BufGenericSycl
+    class BufGenericSycl : public internal::ViewAccessOps<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
+    public:
         static_assert(
             !std::is_const_v<TElem>,
             "The elem type of the buffer can not be const because the C++ Standard forbids containers of const "
             "elements!");
         static_assert(!std::is_const_v<TIdx>, "The idx type of the buffer can not be const!");
 
-    public:
         //! Constructor
         template<typename TExtent, typename Deleter>
-        BufGenericSycl(
-            DevGenericSycl<TPltf> const& dev,
-            TElem* const pMem,
-            Deleter deleter,
-            TExtent const& extent)
+        BufGenericSycl(DevGenericSycl<TPltf> const& dev, TElem* const pMem, Deleter deleter, TExtent const& extent)
             : m_dev{dev}
             , m_extentElements{getExtentVecEnd<TDim>(extent)}
             , m_spMem(pMem, std::move(deleter))
@@ -117,8 +114,7 @@ namespace alpaka::trait
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
     struct GetPtrNative<BufGenericSycl<TElem, TDim, TIdx, TPltf>>
     {
-        ALPAKA_FN_HOST static auto getPtrNative(BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf)
-            -> TElem const*
+        ALPAKA_FN_HOST static auto getPtrNative(BufGenericSycl<TElem, TDim, TIdx, TPltf> const& buf) -> TElem const*
         {
             return buf.m_spMem.get();
         }
@@ -231,15 +227,13 @@ namespace alpaka::trait
     template<typename TElem, typename TDim, typename TIdx, typename TPltf>
     struct GetPtrDev<BufCpu<TElem, TDim, TIdx>, DevGenericSycl<TPltf>>
     {
-        ALPAKA_FN_HOST static auto getPtrDev(
-            BufCpu<TElem, TDim, TIdx> const& buf,
-            DevGenericSycl<TPltf> const& dev) -> TElem const*
+        ALPAKA_FN_HOST static auto getPtrDev(BufCpu<TElem, TDim, TIdx> const& buf, DevGenericSycl<TPltf> const& dev)
+            -> TElem const*
         {
             return getPtrNative(buf);
         }
-        ALPAKA_FN_HOST static auto getPtrDev(
-            BufCpu<TElem, TDim, TIdx>& buf,
-            DevGenericSycl<TPltf> const& dev) -> TElem*
+        ALPAKA_FN_HOST static auto getPtrDev(BufCpu<TElem, TDim, TIdx>& buf, DevGenericSycl<TPltf> const& dev)
+            -> TElem*
         {
             return getPtrNative(buf);
         }
