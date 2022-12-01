@@ -37,6 +37,13 @@ namespace alpaka
             static constexpr auto scope = sycl::memory_scope::device;
             static constexpr auto space = sycl::access::address_space::global_space;
         };
+
+	template<>
+        struct SyclFenceProps<alpaka::memory_scope::Grid>
+        {
+            static constexpr auto scope = sycl::memory_scope::device;
+            static constexpr auto space = sycl::access::address_space::global_space;
+        };
     } // namespace detail
 
     //! The SYCL memory fence.
@@ -63,16 +70,16 @@ namespace alpaka::trait
     {
         static auto mem_fence(MemFenceGenericSycl const& fence, TMemScope const&)
         {
-            static constexpr auto scope = detail::SyclFenceProps<TMemScope>::scope;
-            static constexpr auto space = detail::SyclFenceProps<TMemScope>::space;
+            static constexpr auto scope = alpaka::detail::SyclFenceProps<TMemScope>::scope;
+            static constexpr auto space = alpaka::detail::SyclFenceProps<TMemScope>::space;
 
             // atomic_ref is already part of the SYCL spec but oneAPI has not caught up yet.
             auto dummy
                 = (scope == sycl::memory_scope::work_group)
-                      ? sycl::ext::oneapi::
-                          atomic_ref<int, sycl::ext::oneapi::memory_order::relaxed, scope, space>{fence.m_local_dummy
+                      ? sycl::
+                          atomic_ref<int, sycl::memory_order::relaxed, scope, space>{fence.m_local_dummy
                                                                                                       [0]}
-                      : sycl::ext::oneapi::atomic_ref<int, sycl::ext::oneapi::memory_order::relaxed, scope, space>{
+                      : sycl::atomic_ref<int, sycl::memory_order::relaxed, scope, space>{
                           fence.m_global_dummy[0]};
             auto const dummy_val = dummy.load();
             sycl::atomic_fence(sycl::memory_order::acq_rel, scope);

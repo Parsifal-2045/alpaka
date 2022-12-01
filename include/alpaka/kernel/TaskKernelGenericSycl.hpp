@@ -148,7 +148,8 @@ namespace alpaka
 
             auto output_stream = sycl::stream{buf_size, buf_per_work_item, cgh};
 #    endif
-            cgh.parallel_for<detail::kernel<TAcc, TKernelFnObj, TArgs...>>(
+            // cgh.parallel_for<detail::kernel<TAcc, TKernelFnObj, TArgs...>>( //FIXME_
+            cgh.parallel_for(
                 sycl::nd_range<TDim::value>{global_size, local_size},
                 [=](sycl::nd_item<TDim::value> work_item)
                 {

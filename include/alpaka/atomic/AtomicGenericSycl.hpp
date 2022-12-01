@@ -69,18 +69,17 @@ namespace alpaka
             return sycl::make_ptr<T, sycl::access::address_space::local_space>(addr);
         }
 
-        // atomic_ref is already part of the SYCL spec but oneAPI has not caught up yet.
         template<typename T, typename THierarchy>
-        using global_ref = sycl::ext::oneapi::atomic_ref<
+        using global_ref = sycl::atomic_ref<
             T,
-            sycl::ext::oneapi::memory_order::relaxed,
+            sycl::memory_order::relaxed,
             SyclMemoryScope<THierarchy>::value,
             sycl::access::address_space::global_space>;
 
         template<typename T, typename THierarchy>
-        using local_ref = sycl::ext::oneapi::atomic_ref<
+        using local_ref = sycl::atomic_ref<
             T,
-            sycl::ext::oneapi::memory_order::relaxed,
+            sycl::memory_order::relaxed,
             SyclMemoryScope<THierarchy>::value,
             sycl::access::address_space::local_space>;
 
