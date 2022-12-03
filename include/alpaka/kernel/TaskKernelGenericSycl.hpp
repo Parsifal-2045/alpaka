@@ -123,7 +123,7 @@ namespace alpaka
 
             // register memory fence dummies
             auto global_fence_dummy
-                = global_fence_buf.get_access<sycl::access_mode::read_write, sycl::target::global_buffer>(
+                = global_fence_buf.get_access(
                     cgh); // Exists once per queue
             auto local_fence_dummy
                 = sycl::accessor<int, 1, sycl::access_mode::read_write, sycl::target::local>{sycl::range<1>{1}, cgh};
