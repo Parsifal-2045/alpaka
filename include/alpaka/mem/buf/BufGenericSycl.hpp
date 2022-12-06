@@ -175,7 +175,6 @@ namespace alpaka::trait
 
                 auto const widthBytes = width * static_cast<TIdx>(sizeof(TElem));
                 std::cout << __func__ << " ew: " << width << " ewb: " << widthBytes << '\n';
-
             }
             else if constexpr(TDim::value == 2)
             {
@@ -195,14 +194,14 @@ namespace alpaka::trait
                 auto const widthBytes = width * static_cast<TIdx>(sizeof(TElem));
                 std::cout << __func__ << " ew: " << width << " eh: " << height << " ed: " << depth
                           << " ewb: " << widthBytes << " pitch: " << widthBytes << '\n';
-	    }
-#    endif	    
+            }
+#    endif
 
             auto* memPtr = sycl::malloc_device<TElem>(
                 static_cast<std::size_t>(getExtentProduct(extent)),
-                dev.get_device(),
-                dev.get_context());
-            auto deleter = [&dev](TElem* ptr) { sycl::free(ptr, dev.get_context()); };
+                dev.getNativeHandle().first,
+                dev.getNativeHandle().second);
+            auto deleter = [&dev](TElem* ptr) { sycl::free(ptr, dev.getNativeHandle().second); };
 
             return BufGenericSycl<TElem, TDim, TIdx, TPltf>(dev, memPtr, std::move(deleter), extent);
         }
