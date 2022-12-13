@@ -219,6 +219,7 @@
 #include <alpaka/rand/RandPhilox.hpp>
 #include <alpaka/rand/RandStdLib.hpp>
 #include <alpaka/rand/RandUniformCudaHipRand.hpp>
+#include <alpaka/rand/RandGenericSycl.hpp>
 #include <alpaka/rand/Traits.hpp>
 // idx
 #include <alpaka/idx/Traits.hpp>

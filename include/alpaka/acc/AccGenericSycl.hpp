@@ -24,6 +24,7 @@
 #    include <alpaka/math/MathGenericSycl.hpp>
 #    include <alpaka/mem/fence/MemFenceGenericSycl.hpp>
 #    include <alpaka/meta/SyclPrintf.hpp>
+#    include <alpaka/rand/RandGenericSycl.hpp>
 #    include <alpaka/warp/WarpGenericSycl.hpp>
 #    include <alpaka/workdiv/WorkDivGenericSycl.hpp>
 
@@ -63,6 +64,7 @@ namespace alpaka
         , public BlockSyncGenericSycl<TDim>
         , public IntrinsicGenericSycl
         , public MemFenceGenericSycl
+	, public rand::RandGenericSycl
         , public warp::WarpGenericSycl<TDim>
     {
     public:
@@ -90,6 +92,7 @@ namespace alpaka
             , BlockSyncGenericSycl<TDim>{work_item}
             , IntrinsicGenericSycl{}
             , MemFenceGenericSycl{global_fence_dummy, local_fence_dummy}
+	    , rand::RandGenericSycl{}
             , warp::WarpGenericSycl<TDim>{work_item}
             , cout{output_stream}
         {
