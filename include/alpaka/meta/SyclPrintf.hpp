@@ -13,16 +13,23 @@
 
 #ifdef ALPAKA_ACC_SYCL_ENABLED
 
-#ifdef __SYCL_DEVICE_ONLY__
-#define CONSTANT __attribute__((opencl_constant))
-#else
-#define CONSTANT
-#endif
+// Kill printf in AMD GPU code because of missing compiler support
+#    ifdef __AMDGCN__
+#        include <cstdio> // the define breaks <cstdio> if it is included afterwards
+#        define printf(...)
+#    else
 
-#define printf(FORMAT, ...) \
-do { \
-  static const CONSTANT char format[] = FORMAT; \
-  sycl::ext::oneapi::experimental::printf(format, ##__VA_ARGS__); \
-} while (false)
+#        ifdef __SYCL_DEVICE_ONLY__
+#            define CONSTANT __attribute__((opencl_constant))
+#        else
+#            define CONSTANT
+#        endif
 
+#        define printf(FORMAT, ...)                                                                                   \
+            do                                                                                                        \
+            {                                                                                                         \
+                static const CONSTANT char format[] = FORMAT;                                                         \
+                sycl::ext::oneapi::experimental::printf(format, ##__VA_ARGS__);                                       \
+            } while(false)
+#    endif
 #endif
