@@ -1,4 +1,4 @@
-/* Copyright 2022 Jan Stephan
+/* Copyright 2022 Jan Stephan, Luca Ferragina, Aurora Perego
  *
  * This file is part of Alpaka.
  *
@@ -76,6 +76,7 @@ namespace alpaka
 #    endif
             Vec<TDim, DstSize> const m_dstPitchBytes;
             std::uint8_t* const m_dstMemNative;
+            static constexpr auto is_sycl_task = true;
         };
 
         //! The SYCL device ND memory set task.
@@ -88,34 +89,19 @@ namespace alpaka
 
             using TaskSetSyclBase<TDim, TView, TExtent>::TaskSetSyclBase;
 
-            template<typename TQueue>
-            auto enqueue(TQueue& queue) const -> void
+            auto operator()(sycl::handler& cgh) const -> void
             {
                 ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
 #    if ALPAKA_DEBUG >= ALPAKA_DEBUG_FULL
                 this->printDebug();
 #    endif
-                // [z, y, x] -> [z, y] because all elements with the innermost x dimension are handled within one
-                // iteration.
-                Vec<DimMin1, ExtentSize> const extentWithoutInnermost(subVecBegin<DimMin1>(this->m_extent));
-                // [z, y, x] -> [y, x] because the z pitch (the full idx of the buffer) is not required.
-                Vec<DimMin1, DstSize> const dstPitchBytesWithoutOutmost(subVecEnd<DimMin1>(this->m_dstPitchBytes));
-
                 if(static_cast<std::size_t>(this->m_extent.prod()) != 0u)
                 {
-                    meta::ndLoopIncIdx(
-                        extentWithoutInnermost,
-                        [&](Vec<DimMin1, ExtentSize> const& idx)
-                        {
-                            queue.getNativeHandle().memset(
-                                reinterpret_cast<void*>(
-                                    this->m_dstMemNative
-                                    + (castVec<DstSize>(idx) * dstPitchBytesWithoutOutmost)
-                                          .foldrAll(std::plus<DstSize>())),
-                                this->m_byte,
-                                static_cast<std::size_t>(this->m_extentWidthBytes));
-                        });
+                    cgh.memset(
+                        reinterpret_cast<void*>(this->m_dstMemNative),
+                        this->m_byte,
+                        static_cast<std::size_t>(this->m_extentWidthBytes * this->m_extent.prod()));
                 }
             }
         };
@@ -126,8 +112,7 @@ namespace alpaka
         {
             using TaskSetSyclBase<DimInt<1u>, TView, TExtent>::TaskSetSyclBase;
 
-            template<typename TQueue>
-            auto enqueue(TQueue& queue) const -> void
+            auto operator()(sycl::handler& cgh) const -> void
             {
                 ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
@@ -136,7 +121,7 @@ namespace alpaka
 #    endif
                 if(static_cast<std::size_t>(this->m_extent.prod()) != 0u)
                 {
-                    queue.getNativeHandle().memset(
+                    cgh.memset(
                         reinterpret_cast<void*>(this->m_dstMemNative),
                         this->m_byte,
                         static_cast<std::size_t>(this->m_extentWidthBytes));
@@ -172,19 +157,19 @@ namespace alpaka
             }
 #    endif
 
-            template<typename TQueue>
-            auto enqueue(TQueue& queue) const -> void
+            auto operator()(sycl::handler& cgh) const -> void
             {
                 ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
 #    if ALPAKA_DEBUG >= ALPAKA_DEBUG_FULL
                 printDebug();
 #    endif
-                queue.getNativeHandle().memset(reinterpret_cast<void*>(m_dstMemNative), m_byte, sizeof(Elem));
+                cgh.memset(reinterpret_cast<void*>(m_dstMemNative), m_byte, sizeof(Elem));
             }
 
             std::uint8_t const m_byte;
             std::uint8_t* const m_dstMemNative;
+            static constexpr auto is_sycl_task = true;
         };
 
     } // namespace detail
@@ -200,136 +185,6 @@ namespace alpaka
                 -> alpaka::detail::TaskSetSycl<TDim, TView, TExtent>
             {
                 return alpaka::detail::TaskSetSycl<TDim, TView, TExtent>(view, byte, extent);
-            }
-        };
-
-        //! The SYCL non-blocking device queue scalar set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclNonBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
-            }
-        };
-
-        //! The SYCL blocking device queue scalar set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<0u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
-                queue.getNativeHandle().wait();
-            }
-        };
-
-        //! The SYCL non-blocking device queue 1D set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclNonBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
-            }
-        };
-
-        //! The SYCL blocking device queue 1D set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<1u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
-                queue.getNativeHandle().wait();
-            }
-        };
-
-        //! The SYCL non-blocking device queue 2D set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclNonBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<2u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<2u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
-            }
-        };
-
-        //! The SYCL blocking device queue 2D set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<2u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<2u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
-            }
-        };
-
-        //! The SYCL non-blocking device queue 3D set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclNonBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<3u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclNonBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<3u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
-            }
-        };
-
-        //! The SYCL blocking device queue 3D set enqueue trait specialization.
-        template<typename TView, typename TExtent, typename TPltf>
-        struct Enqueue<
-            alpaka::QueueGenericSyclBlocking<TPltf>,
-            alpaka::detail::TaskSetSycl<DimInt<3u>, TView, TExtent>>
-        {
-            ALPAKA_FN_HOST static auto enqueue(
-                alpaka::QueueGenericSyclBlocking<TPltf>& queue,
-                alpaka::detail::TaskSetSycl<DimInt<3u>, TView, TExtent> const& task) -> void
-            {
-                ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
-
-                task.enqueue(queue);
             }
         };
 
