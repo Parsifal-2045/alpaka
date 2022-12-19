@@ -1,4 +1,4 @@
-/* Copyright 2022 Jan Stephan
+/* Copyright 2022 Jan Stephan, Luca Ferragina, Aurora Perego
  *
  * This file is part of Alpaka.
  *
@@ -224,22 +224,20 @@ namespace alpaka::trait
     };
 
     //! The pinned/mapped memory allocation trait specialization for the SYCL devices.
-    template<typename TElem, typename TDim, typename TIdx, typename TPltf>
-    struct BufAllocMapped<TElem, TDim, TIdx, DevGenericSycl<TPltf>>
+    template<typename TPltf, typename TElem, typename TDim, typename TIdx>
+    struct BufAllocMapped
     {
         template<typename TExtent>
-        ALPAKA_FN_HOST static auto allocMappedBuf(
-            DevCpu const& host,
-            DevGenericSycl<TPltf> const& dev,
-            TExtent const& extent) -> BufCpu<TElem, TDim, TIdx>
+        ALPAKA_FN_HOST static auto allocMappedBuf(DevCpu const& host, TExtent const& extent)
+            -> BufCpu<TElem, TDim, TIdx>
         {
             ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
             // Allocate SYCL page-locked memory on the host, mapped into the TPltf address space and
             // accessible to all devices in the TPltf.
-            TElem* memPtr
-                = sycl::malloc_host<TElem>(static_cast<std::size_t>(getExtentProduct(extent)), dev.get_context());
-            auto deleter = [&dev](TElem* ptr) { sycl::free(ptr, dev.get_context()); };
+            auto ctx = TPltf::syclContext();
+            TElem* memPtr = sycl::malloc_host<TElem>(static_cast<std::size_t>(getExtentProduct(extent)), ctx);
+            auto deleter = [ctx](TElem* ptr) { sycl::free(ptr, ctx); };
 
             return BufCpu<TElem, TDim, TIdx>(host, memPtr, std::move(deleter), extent);
         }

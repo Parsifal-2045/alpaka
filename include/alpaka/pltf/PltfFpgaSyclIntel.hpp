@@ -18,22 +18,14 @@
 #    include <CL/sycl.hpp>
 #    include <sycl/ext/intel/fpga_extensions.hpp>
 
-#    include <string>
-
 namespace alpaka
 {
     //! The SYCL device manager.
-    class PltfFpgaSyclIntel : public PltfGenericSycl
-    {
-    public:
-        PltfFpgaSyclIntel() = delete;
-
 #    ifdef ALPAKA_FPGA_EMULATION
-        using selector = sycl::ext::intel::fpga_emulator_selector;
+    using PltfFpgaSyclIntel = PltfGenericSycl<sycl::ext::intel::fpga_emulator_selector>;
 #    else
-        using selector = sycl::ext::intel::fpga_selector;
+    using PltfFpgaSyclIntel = PltfGenericSycl<sycl::ext::intel::fpga_selector>;
 #    endif
-    };
 } // namespace alpaka
 
 namespace alpaka::trait

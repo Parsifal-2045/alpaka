@@ -45,13 +45,7 @@ namespace alpaka
     } // namespace detail
 
     //! The SYCL device manager.
-    class PltfFpgaSyclXilinx : public PltfGenericSycl
-    {
-    public:
-        PltfFpgaSyclXilinx() = delete;
-
-        using selector = detail::XilinxFpgaSelector;
-    };
+    using PltfFgpaSyclIntel = PltfGenericSycl<detail::XilinxFpgaSelector>;
 } // namespace alpaka
 
 namespace alpaka::trait

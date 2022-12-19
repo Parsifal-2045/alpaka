@@ -45,13 +45,7 @@ namespace alpaka
     } // namespace detail
 
     //! The SYCL device manager.
-    class PltfCpuSyclIntel : public PltfGenericSycl
-    {
-    public:
-        PltfCpuSyclIntel() = delete;
-
-        using selector = detail::IntelCpuSelector;
-    };
+    using PltfCpuSyclIntel = PltfGenericSycl<detail::IntelCpuSelector>;
 } // namespace alpaka
 
 namespace alpaka::trait
