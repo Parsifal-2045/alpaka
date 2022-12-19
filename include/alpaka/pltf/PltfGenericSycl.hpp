@@ -93,7 +93,9 @@ namespace alpaka
         // Use destructor attribute to make sure our static variables are destroyed in the correct order at shutdown.
         [[gnu::destructor]] static auto reset() -> void
         {
+#    if ALPAKA_DEBUG >= ALPAKA_DEBUG_MINIMAL
             std::cout << "Alpaka destructor " << core::demangled<TSelector> << std::endl;
+#    endif
             auto lock
                 = std::scoped_lock<std::mutex, std::mutex, std::mutex>{platform_mutex, devices_mutex, context_mutex};
             context_opt.reset();
