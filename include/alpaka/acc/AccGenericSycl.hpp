@@ -24,7 +24,7 @@
 #    include <alpaka/math/MathGenericSycl.hpp>
 #    include <alpaka/mem/fence/MemFenceGenericSycl.hpp>
 #    include <alpaka/meta/SyclPrintf.hpp>
-#    include <alpaka/rand/RandGenericSycl.hpp>
+//#    include <alpaka/rand/RandGenericSycl.hpp> //FIXME_
 #    include <alpaka/warp/WarpGenericSycl.hpp>
 #    include <alpaka/workdiv/WorkDivGenericSycl.hpp>
 
@@ -64,7 +64,7 @@ namespace alpaka
         , public BlockSyncGenericSycl<TDim>
         , public IntrinsicGenericSycl
         , public MemFenceGenericSycl
-	, public rand::RandGenericSycl
+	//, public rand::RandGenericSycl
         , public warp::WarpGenericSycl<TDim>
     {
     public:
