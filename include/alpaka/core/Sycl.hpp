@@ -23,6 +23,26 @@
 
 #    include <CL/sycl.hpp>
 
+// if SYCL is enabled with the AMD backend the printf will be killed because of missing compiler support
+#    ifdef __AMDGCN__
+#        include <cstdio> // the define breaks <cstdio> if it is included afterwards
+#        define printf(...)
+#    else
+
+#        ifdef __SYCL_DEVICE_ONLY__
+using AlpakaFormat = char const* [[clang::opencl_constant]];
+#        else
+using AlpakaFormat = char const*;
+#        endif
+#        define printf(FORMAT, ...)                                                                                   \
+            do                                                                                                        \
+            {                                                                                                         \
+                static const auto format = AlpakaFormat{FORMAT};                                                      \
+                sycl::ext::oneapi::experimental::printf(format, ##__VA_ARGS__);                                       \
+            } while(false)
+
+#    endif
+
 // SYCL vector types trait specializations.
 namespace alpaka
 {

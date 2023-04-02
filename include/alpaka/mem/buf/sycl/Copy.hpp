@@ -149,7 +149,7 @@ namespace alpaka::detail
         ALPAKA_FN_HOST TaskCopySycl(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
-            [[maybe_unused]] TExtent const& extent)
+            TExtent const& extent)
             : m_dstMemNative(reinterpret_cast<void*>(getPtrNative(viewDst)))
             , m_srcMemNative(reinterpret_cast<void const*>(getPtrNative(viewSrc)))
         {

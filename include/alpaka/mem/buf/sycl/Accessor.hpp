@@ -115,14 +115,6 @@ namespace alpaka
 
     namespace experimental::trait
     {
-        namespace internal
-        {
-            template<typename TElem, typename TDim, typename TIdx, typename TDev>
-            struct IsView<BufGenericSycl<TElem, TDim, TIdx, TDev>> : std::false_type
-            {
-            };
-        } // namespace internal
-
         template<typename TElem, typename TDim, typename TIdx, typename TDev>
         struct BuildAccessor<BufGenericSycl<TElem, TDim, TIdx, TDev>>
         {
