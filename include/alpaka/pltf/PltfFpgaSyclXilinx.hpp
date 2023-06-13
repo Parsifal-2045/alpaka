@@ -24,14 +24,14 @@ namespace alpaka
 #        pragma clang diagnostic push
 #        pragma clang diagnostic ignored "-Wweak-vtables"
 #    endif
-        struct XilinxFpgaSelector : sycl::device_selector
+        struct XilinxFpgaSelector final
         {
-            auto operator()(sycl::device const& dev) const -> int override
+            auto operator()(sycl::device const& dev) const -> int
             {
-                auto const vendor = dev.get_info<sycl::info::device::vendor>();
-                auto const is_xilinx = (vendor.find("Xilinx") != std::string::npos);
+                auto const& vendor = dev.get_info<sycl::info::device::vendor>();
+                auto const is_xilinx_fpga = dev.is_accelerator() && (vendor.find("Xilinx") != std::string::npos);
 
-                return is_xilinx ? 1 : -1;
+                return is_xilinx_fpga ? 1 : -1;
             }
         };
 #    if BOOST_COMP_CLANG
@@ -40,7 +40,7 @@ namespace alpaka
     } // namespace detail
 
     //! The SYCL device manager.
-    using PltfFgpaSyclIntel = PltfGenericSycl<detail::XilinxFpgaSelector>;
+    using PltfFpgaSyclXilinx = PltfGenericSycl<detail::XilinxFpgaSelector>;
 } // namespace alpaka
 
 namespace alpaka::trait
