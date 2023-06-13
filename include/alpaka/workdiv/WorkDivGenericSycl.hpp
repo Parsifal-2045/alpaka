@@ -55,7 +55,9 @@ namespace alpaka::trait
         //! \return The number of blocks in each dimension of the grid.
         static auto getWorkDiv(WorkDivGenericSycl<TDim, TIdx> const& workDiv) -> Vec<TDim, TIdx>
         {
-            if constexpr(TDim::value == 1)
+            if constexpr(TDim::value == 0)
+                return Vec<TDim, TIdx>{};
+            else if constexpr(TDim::value == 1)
                 return Vec<TDim, TIdx>{static_cast<TIdx>(workDiv.my_item.get_group_range(0))};
             else if constexpr(TDim::value == 2)
             {
@@ -80,7 +82,9 @@ namespace alpaka::trait
         //! \return The number of threads in each dimension of a block.
         static auto getWorkDiv(WorkDivGenericSycl<TDim, TIdx> const& workDiv) -> Vec<TDim, TIdx>
         {
-            if constexpr(TDim::value == 1)
+            if constexpr(TDim::value == 0)
+                return Vec<TDim, TIdx>{};
+            else if constexpr(TDim::value == 1)
                 return Vec<TDim, TIdx>{static_cast<TIdx>(workDiv.my_item.get_local_range(0))};
             else if constexpr(TDim::value == 2)
             {
@@ -102,7 +106,7 @@ namespace alpaka::trait
     template<typename TDim, typename TIdx>
     struct GetWorkDiv<WorkDivGenericSycl<TDim, TIdx>, origin::Thread, unit::Elems>
     {
-        //! \return The number of blocks in each dimension of the grid.
+        //! \return The number of elements in each dimension of the thread.
         static auto getWorkDiv(WorkDivGenericSycl<TDim, TIdx> const& workDiv) -> Vec<TDim, TIdx>
         {
             return workDiv.m_threadElemExtent;
