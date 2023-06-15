@@ -448,7 +448,7 @@ namespace alpaka::math::trait
     {
         auto operator()(math::IsfiniteGenericSycl const&, TArg const& arg)
         {
-            return sycl::isfinite(arg);
+            return static_cast<bool>(sycl::isfinite(arg));
         }
     };
 
@@ -458,7 +458,7 @@ namespace alpaka::math::trait
     {
         auto operator()(math::IsinfGenericSycl const&, TArg const& arg)
         {
-            return sycl::isinf(arg);
+            return static_cast<bool>(sycl::isinf(arg));
         }
     };
 
@@ -468,7 +468,7 @@ namespace alpaka::math::trait
     {
         auto operator()(math::IsnanGenericSycl const&, TArg const& arg)
         {
-            return sycl::isnan(arg);
+            return static_cast<bool>(sycl::isnan(arg));
         }
     };
 
