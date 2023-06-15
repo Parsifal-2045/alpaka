@@ -99,17 +99,12 @@ namespace alpaka
         inline auto casWithCondition(T* const addr, TEval&& eval)
         {
             auto ref = TRef{*addr};
-
             auto old_val = ref.load();
-            auto assumed = T{};
 
-            do
+            // prefer compare_exchange_weak when in a loop, assuming that eval is not expensive
+            while(!ref.compare_exchange_weak(old_val, eval(old_val)))
             {
-                assumed = old_val;
-                auto const new_val = eval(old_val);
-                old_val = ref.compare_exchange_strong(assumed, new_val);
-            } while(assumed != old_val);
-
+            }
 
             return old_val;
         }
@@ -276,22 +271,21 @@ namespace alpaka::trait
     {
         static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
 
-        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& compare, T const& value) -> T
+        static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& expected, T const& desired) -> T
         {
-            auto cas = [&compare, &value](auto& ref)
+            auto cas = [&expected, &desired](auto& ref)
             {
-                // SYCL stores the value in *addr to the "compare" parameter if the values are not equal. Since
-                // alpaka's interface does not expect this we need to copy "compare" to this function and forget it
-                // afterwards.
-                auto tmp = compare;
+                auto expected_ = expected;
+                // Atomically compares the value of `ref` with the value of `expected`.
+                // If the values are equal, replaces the value of `ref` with `desired`.
+                // Otherwise updates `expected` with the value of `ref`.
+                // Returns a bool telling us if the exchange happened or not, but the Alpaka API does not make use of
+                // it.
+                ref.compare_exchange_strong(expected_, desired);
 
-                // We always want to return the old value at the end.
-                const auto old = ref.load();
-
-                // This returns a bool telling us if the exchange happened or not. Useless in this case.
-                ref.compare_exchange_strong(tmp, value);
-
-                return old;
+                // If the update succeded, return the previous value of `ref`.
+                // Otherwise, return the current value of `ref`.
+                return expected_;
             };
 
             if(auto ptr = alpaka::detail::get_global_ptr(addr); ptr != nullptr)
