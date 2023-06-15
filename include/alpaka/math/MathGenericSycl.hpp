@@ -279,7 +279,7 @@ namespace alpaka::math::trait
             if constexpr(std::is_integral_v<TArgument>)
                 return sycl::atan2(0.0, static_cast<double>(argument));
             else if constexpr(std::is_floating_point_v<TArgument>)
-                return sycl::atan2(TArgument{0.0}, argument);
+                return sycl::atan2(static_cast<TArgument>(0.0), argument);
             else
                 static_assert(!sizeof(TArgument), "Unsupported data type");
         }
