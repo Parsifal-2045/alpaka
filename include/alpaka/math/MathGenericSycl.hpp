@@ -526,7 +526,8 @@ namespace alpaka::math::trait
     {
         auto operator()(math::PowGenericSycl const&, TBase const& base, TExp const& exp)
         {
-            return sycl::pow(base, exp);
+            using TCommon = std::common_type_t<TBase, TExp>;
+            return sycl::pow(static_cast<TCommon>(base), static_cast<TCommon>(exp));
         }
     };
 
