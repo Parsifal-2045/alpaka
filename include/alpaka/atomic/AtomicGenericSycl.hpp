@@ -177,7 +177,7 @@ namespace alpaka::trait
     template<typename T, typename THierarchy>
     struct AtomicOp<AtomicExch, AtomicGenericSycl, T, THierarchy>
     {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>, "SYCL atomics do not support this type");
+        static_assert((std::is_integral_v<T> || std::is_floating_point_v<T>) && (sizeof(T) == 4 || sizeof(T) == 8), "SYCL atomics do not support this type");
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
@@ -190,11 +190,11 @@ namespace alpaka::trait
     template<typename T, typename THierarchy>
     struct AtomicOp<AtomicInc, AtomicGenericSycl, T, THierarchy>
     {
-        static_assert(std::is_unsigned_v<T>, "atomicInc only supported for unsigned types");
+        static_assert(std::is_unsigned_v<T> && (sizeof(T) == 4 || sizeof(T) == 8), "SYCL atomics support only 32- and 64-bits unsigned integral types");
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
-            auto inc = [&value](auto old_val) { return (old_val >= value) ? static_cast<T>(0) : (old_val + 1u); };
+            auto inc = [&value](auto old_val) { return (old_val >= value) ? static_cast<T>(0) : (old_val + static_cast<T>(1)); };
             if(auto ptr = alpaka::detail::get_global_ptr(addr); ptr != nullptr)
                 return alpaka::detail::casWithCondition<alpaka::detail::global_ref<T, THierarchy>>(addr, inc);
             else
@@ -207,12 +207,12 @@ namespace alpaka::trait
     template<typename T, typename THierarchy>
     struct AtomicOp<AtomicDec, AtomicGenericSycl, T, THierarchy>
     {
-        static_assert(std::is_unsigned_v<T>, "atomicDec only supported for unsigned types");
+        static_assert(std::is_unsigned_v<T> && (sizeof(T) == 4 || sizeof(T) == 8), "SYCL atomics support only 32- and 64-bits unsigned integral types");
 
         static auto atomicOp(AtomicGenericSycl const&, T* const addr, T const& value) -> T
         {
             auto dec
-                = [&value](auto& old_val) { return ((old_val == 0) || (old_val > value)) ? value : (old_val - 1u); };
+                = [&value](auto& old_val) { return ((old_val == 0) || (old_val > value)) ? value : (old_val - static_cast<T>(1)); };
             if(auto ptr = alpaka::detail::get_global_ptr(addr); ptr != nullptr)
                 return alpaka::detail::casWithCondition<alpaka::detail::global_ref<T, THierarchy>>(addr, dec);
             else
