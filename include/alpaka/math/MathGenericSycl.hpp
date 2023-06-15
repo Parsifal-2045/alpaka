@@ -580,9 +580,9 @@ namespace alpaka::math::trait
     {
         auto operator()(math::RsqrtGenericSycl const&, TArg const& arg)
         {
-            if(std::is_floating_point_v<TArg>)
+            if constexpr(std::is_floating_point_v<TArg>)
                 return sycl::rsqrt(arg);
-            else if(std::is_integral_v<TArg>)
+            else if constexpr(std::is_integral_v<TArg>)
                 return sycl::rsqrt(static_cast<double>(arg)); // mirror CUDA back-end and use double for ints
             else
                 static_assert(!sizeof(TArg), "Unsupported data type");
