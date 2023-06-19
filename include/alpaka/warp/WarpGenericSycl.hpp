@@ -88,6 +88,10 @@ namespace alpaka::warp::trait
         template<typename T>
         static auto shfl(warp::WarpGenericSycl<TDim> const& warp, T value, std::int32_t srcLane, std::int32_t width)
         {
+            ALPAKA_ASSERT_OFFLOAD(width > 0);
+            ALPAKA_ASSERT_OFFLOAD(srcLane < width);
+            ALPAKA_ASSERT_OFFLOAD(srcLane >= 0);
+
             /* If width < srcLane the sub-group needs to be split into assumed subdivisions. The first item of each
                subdivision has the assumed index 0. The srcLane index is relative to the subdivisions.
 
@@ -95,14 +99,9 @@ namespace alpaka::warp::trait
                The first starts at sub-group index 0 and the second at sub-group index 16. For srcLane = 4 the
                first subdivision will access the value at sub-group index 4 and the second at sub-group index 20. */
             auto const actual_group = warp.m_item.get_sub_group();
-            auto const actual_item_id = actual_group.get_local_linear_id();
-
-            auto const assumed_group_id = actual_item_id / width;
-            auto const assumed_item_id = actual_item_id % width;
-
-            auto const assumed_src_id = static_cast<std::size_t>(srcLane % width);
-            auto const actual_src_id = assumed_src_id + assumed_group_id * width;
-
+            auto const actual_item_id = static_cast<std::int32_t>(actual_group.get_local_linear_id());
+            auto const actual_group_id = actual_item_id / width;
+            auto const actual_src_id = static_cast<std::size_t>(srcLane + actual_group_id * width);
             auto const src = sycl::id<1>{actual_src_id};
 
             return sycl::select_from_group(actual_group, value, src);
