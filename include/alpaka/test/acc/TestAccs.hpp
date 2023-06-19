@@ -153,6 +153,11 @@ namespace alpaka::test
 
     namespace detail
     {
+        //! A std::tuple holding non-zero dimensions.
+        //!
+        //! NonZeroTestDims = std::tuple<Dim1, Dim2, Dim3, ... DimN>
+        using NonZeroTestDims = meta::Filter<TestDims, meta::NonZero>;
+
         //! A std::tuple holding multiple std::tuple consisting of a dimension and a idx type.
         //!
         //! TestDimIdxTuples =
@@ -162,7 +167,7 @@ namespace alpaka::test
         //!         tuple<Dim3,Idx1>,
         //!         ...,
         //!         tuple<DimN,IdxN>>
-        using TestDimIdxTuples = meta::CartesianProduct<std::tuple, TestDims, TestIdxs>;
+        using TestDimIdxTuples = meta::CartesianProduct<std::tuple, NonZeroTestDims, TestIdxs>;
 
         template<typename TList>
         using ApplyEnabledAccs = meta::Apply<TList, EnabledAccs>;
