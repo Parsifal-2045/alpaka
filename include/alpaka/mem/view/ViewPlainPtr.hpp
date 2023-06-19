@@ -5,9 +5,11 @@
 #pragma once
 
 #include <alpaka/dev/DevCpu.hpp>
+#include <alpaka/dev/DevGenericSycl.hpp>
 #include <alpaka/dev/DevUniformCudaHipRt.hpp>
 #include <alpaka/mem/view/Traits.hpp>
 #include <alpaka/mem/view/ViewAccessOps.hpp>
+#include <alpaka/meta/DependentFalseType.hpp>
 #include <alpaka/vec/Vec.hpp>
 
 #include <type_traits>
@@ -175,6 +177,17 @@ namespace alpaka
                         dev,
                         extent);
             }
+        };
+#endif
+
+#if defined(ALPAKA_ACC_SYCL_ENABLED)
+        //! The SYCL device CreateStaticDevMemView trait specialization.
+        template<typename TPltf>
+        struct CreateStaticDevMemView<DevGenericSycl<TPltf>>
+        {
+            static_assert(
+                meta::DependentFalseType<TPltf>::value,
+                "The SYCL backend does not support global device variables.");
         };
 #endif
 
