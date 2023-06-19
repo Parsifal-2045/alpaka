@@ -30,6 +30,8 @@ Because all supported compilers are identified as `Clang` by CMake 3.18 it is th
 * `alpaka_SYCL_IOSTREAM_KIB`: Kibibytes per block reserved as output buffer for device-side printing. This cannot exceed the amount of shared memory per block. Only takes effect if `alpaka_SYCL_ENABLE_IOSTREAM` is enabled. Default: `64`.
 * `alpaka_SYCL_PLATFORM_ONEAPI`: set to `ON` to enable the oneAPI hardware targets. Requires the activation of at least one Intel hardware target (see below).
 * `alpaka_SYCL_PLATFORM_XILINX`: set to `ON` to enable the AMD/Xilinx hardware targets.
+* `MKL_ROOT`: always required. Set to the root of your oneMKL installation. Example: `/opt/intel/oneapi/mkl/2023.1.0`.
+* `oneDPL_DIR`: always required. Set to the CMake path of your oneDPL installation. Example: `/opt/intel/oneapi/dpl/2022.1.0/lib/cmake/oneDPL`.
 
 ### Building for Intel CPUs
 

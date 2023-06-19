@@ -631,12 +631,12 @@ if(alpaka_ACC_SYCL_ENABLE)
 
     if(alpaka_SYCL_ONEAPI_GPU)
         # Create a drop-down list (in cmake-gui) of valid Intel GPU targets. On the command line the user can specifiy
-        # additional targets, such as ranges: "Gen8-Gen12LP" or lists: "icclp;skl".
+        # additional targets, such as ranges: "Gen8-Gen12LP" or lists: "icllp;skl".
         set(alpaka_SYCL_ONEAPI_GPU_DEVICES "bdw" CACHE STRING "Intel GPU devices / generations to compile for")
         set_property(CACHE alpaka_SYCL_ONEAPI_GPU_DEVICES
                      PROPERTY STRINGS "bdw;skl;kbl;cfl;bxt;glk;icllp;lkf;ehl;tgllp;rkl;adls;adlp;dg1;xe_hp_sdv;Gen8;Gen9;Gen11;Gen12LP;XE_HP_CORE")
         # If the user has given us a list turn all ';' into ',' to pacify the Intel OpenCL compiler.
-        string(REPLACE alpaka_ONEAPI_GPU_DEVICES REPLACE ";" ",")
+        string(REPLACE ";" "," alpaka_SYCL_ONEAPI_GPU_DEVICES "${alpaka_SYCL_ONEAPI_GPU_DEVICES}")
         
         target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_ONEAPI_GPU")
         target_link_options(alpaka INTERFACE "SHELL:-Xsycl-target-backend=${alpaka_SYCL_ONEAPI_GPU_TARGET} \"-device ${alpaka_SYCL_ONEAPI_GPU_DEVICES}\"")
@@ -650,6 +650,15 @@ if(alpaka_ACC_SYCL_ENABLE)
         target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_IOSTREAM_ENABLED")
         target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_IOSTREAM_KIB=${alpaka_SYCL_IOSTREAM_KIB}")
     endif()
+
+    # We always need oneDPL
+    find_package(oneDPL REQUIRED)
+    target_link_libraries(alpaka INTERFACE oneDPL)
+
+    # Use MKL RNG
+    find_package(MKL REQUIRED)
+    target_link_libraries(alpaka INTERFACE MKL::MKL_DPCPP)
+
     alpaka_set_compiler_options(DEVICE target alpaka "-fsycl-unnamed-lambda") # Compiler default but made explicit here
 endif()
 
