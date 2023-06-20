@@ -1,4 +1,4 @@
-/* Copyright 2019 Axel Huebl, Benjamin Worpitz, Matthias Werner
+/* Copyright 2023 Axel Hübl, Benjamin Worpitz, Matthias Werner, Jan Stephan, René Widera, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 

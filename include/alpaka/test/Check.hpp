@@ -1,4 +1,4 @@
-/* Copyright 2022 Benjamin Worpitz, Jan Stephan, Aurora Perego
+/* Copyright 2023 Benjamin Worpitz, Jan Stephan, Luca Ferragina, Aurora Perego, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 

@@ -1,4 +1,4 @@
-/* Copyright 2023 Simeon Ehrig, Jan Stephan
+/* Copyright 2023 Simeon Ehrig, Jan Stephan, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 

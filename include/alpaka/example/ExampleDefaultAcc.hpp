@@ -1,4 +1,4 @@
-/* Copyright 2023 Jeffrey Kelling, Bernhard Manfred Gruber, Jan Stephan
+/* Copyright 2023 Jeffrey Kelling, Bernhard Manfred Gruber, Jan Stephan, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 

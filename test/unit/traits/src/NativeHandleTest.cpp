@@ -1,4 +1,4 @@
-/* Copyright 2022 Antonio Di Pilato, Jan Stephan
+/* Copyright 2023 Antonio Di Pilato, Jan Stephan, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 

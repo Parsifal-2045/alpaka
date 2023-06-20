@@ -1,5 +1,5 @@
 /* Copyright 2023 Axel Hübl, Benjamin Worpitz, Matthias Werner, René Widera, Jan Stephan, Bernhard Manfred Gruber,
- *                Sergei Bastrakov
+ *                Sergei Bastrakov, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 
