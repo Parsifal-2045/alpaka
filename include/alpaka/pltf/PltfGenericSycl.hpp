@@ -230,23 +230,24 @@ namespace alpaka::trait
 
             std::cout << "SYCL version: " << device.get_info<sycl::info::device::version>() << '\n';
 
-#if !defined(BOOST_COMP_ICPX)
+#        if !defined(BOOST_COMP_ICPX)
             // Not defined by Level Zero back-end
             std::cout << "Backend version: " << device.get_info<sycl::info::device::backend_version>() << '\n';
-#endif
+#        endif
 
-            std::cout << "Aspects: " << '\n';            std::cout.flush();
-            
-#if defined(BOOST_COMP_ICPX)
-#if BOOST_COMP_ICPX >= BOOST_VERSION_NUMBER(53, 2, 0)
+            std::cout << "Aspects: " << '\n';
+            std::cout.flush();
+
+#        if defined(BOOST_COMP_ICPX)
+#            if BOOST_COMP_ICPX >= BOOST_VERSION_NUMBER(53, 2, 0)
             // These aspects are missing from oneAPI versions < 2023.2.0
             if(device.has(sycl::aspect::emulated))
                 std::cout << "\t* emulated\n";
-            
+
             if(device.has(sycl::aspect::host_debuggable))
                 std::cout << "\t* debuggable using standard debuggers\n";
-#endif
-#endif
+#            endif
+#        endif
 
             if(device.has(sycl::aspect::fp16))
                 std::cout << "\t* supports sycl::half precision\n";
@@ -537,11 +538,11 @@ namespace alpaka::trait
                     case sycl::memory_order::seq_cst:
                         std::cout << "seq_cst";
                         break;
-                    #if defined(BOOST_COMP_ICPX)
+#        if defined(BOOST_COMP_ICPX)
                     // Stop icpx from complaining about its own internals.
                     case sycl::memory_order::__consume_unsupported:
                         break;
-                    #endif
+#        endif
                     }
                     std::cout << ", ";
                 }
@@ -552,14 +553,14 @@ namespace alpaka::trait
             auto const mem_orders = device.get_info<sycl::info::device::atomic_memory_order_capabilities>();
             print_memory_orders(mem_orders);
 
-#if defined(BOOST_COMP_ICPX)
-#if BOOST_COMP_ICPX >= BOOST_VERSION_NUMBER(53,2,0)
+#        if defined(BOOST_COMP_ICPX)
+#            if BOOST_COMP_ICPX >= BOOST_VERSION_NUMBER(53, 2, 0)
             // Not implemented in oneAPI < 2023.2.0
             std::cout << "Supported memory orderings for sycl::atomic_fence: ";
             auto const fence_orders = device.get_info<sycl::info::device::atomic_fence_order_capabilities>();
             print_memory_orders(fence_orders);
-#endif
-#endif
+#            endif
+#        endif
 
             auto print_memory_scopes = [](std::vector<sycl::memory_scope> const& mem_scopes)
             {
@@ -596,14 +597,14 @@ namespace alpaka::trait
             auto const mem_scopes = device.get_info<sycl::info::device::atomic_memory_scope_capabilities>();
             print_memory_scopes(mem_scopes);
 
-#if defined(BOOST_COMP_ICPX)
-#if BOOST_COMP_ICPX >= BOOST_VERSION_NUMBER(53,2,0)
+#        if defined(BOOST_COMP_ICPX)
+#            if BOOST_COMP_ICPX >= BOOST_VERSION_NUMBER(53, 2, 0)
             // Not implemented in oneAPI < 2023.2.0
             std::cout << "Supported memory scopes for sycl::atomic_fence: ";
             auto const fence_scopes = device.get_info<sycl::info::device::atomic_fence_scope_capabilities>();
             print_memory_scopes(fence_scopes);
-#endif
-#endif
+#            endif
+#        endif
 
             std::cout << "Device timer resolution: "
                       << device.get_info<sycl::info::device::profiling_timer_resolution>() << " ns\n";
@@ -643,11 +644,11 @@ namespace alpaka::trait
                         std::cout << "by affinity domain";
                         has_affinity_domains = true;
                         break;
-#if defined(BOOST_COMP_ICPX)
+#        if defined(BOOST_COMP_ICPX)
                     case sycl::info::partition_property::ext_intel_partition_by_cslice:
                         std::cout << "by compute slice (Intel extension; deprecated)";
                         break;
-#endif
+#        endif
                     }
                     std::cout << ", ";
                 }
@@ -713,11 +714,11 @@ namespace alpaka::trait
                     std::cout << "partitioned by affinity domain";
                     break;
 
-#if defined(BOOST_COMP_ICPX)
+#        if defined(BOOST_COMP_ICPX)
                 case sycl::info::partition_property::ext_intel_partition_by_cslice:
                     std::cout << "partitioned by compute slice (Intel extension; deprecated)";
                     break;
-#endif
+#        endif
                 }
                 std::cout << '\n';
 

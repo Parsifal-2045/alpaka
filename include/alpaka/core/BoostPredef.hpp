@@ -72,7 +72,7 @@
 // Intel LLVM compiler detection
 #if !defined(BOOST_COMP_ICPX)
 #    if defined(SYCL_LANGUAGE_VERSION) && defined(__INTEL_LLVM_COMPILER)
-         // The version string for icpx 2023.1.0 is 20230100. In Boost.Predef this becomes (53,1,0).
+// The version string for icpx 2023.1.0 is 20230100. In Boost.Predef this becomes (53,1,0).
 #        define BOOST_COMP_ICPX BOOST_PREDEF_MAKE_YYYYMMDD(__INTEL_LLVM_COMPILER)
 #    endif
 #endif

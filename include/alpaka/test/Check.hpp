@@ -16,7 +16,7 @@
             {                                                                                                         \
                 /*if constexpr(alpaka::accMatchesTags<   TODO                                                         \
                                  decltype(acc),                                                                       \
-                                 alpaka::TagCpuSycl,                                                             \
+                                 alpaka::TagCpuSycl,                                                                  \
                                  alpaka::TagFpgaSyclIntel,                                                            \
                                  alpaka::TagFpgaSyclXilinx,                                                           \
                                  alpaka::TagGpuSyclIntel,                                                             \

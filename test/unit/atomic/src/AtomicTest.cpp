@@ -1,4 +1,5 @@
-/* Copyright 2023 Axel Hübl, Benjamin Worpitz, Matthias Werner, Sergei Bastrakov, René Widera, Jan Stephan, Bernhard Manfred Gruber, Antonio Di Pilato, Andrea Bocci
+/* Copyright 2023 Axel Hübl, Benjamin Worpitz, Matthias Werner, Sergei Bastrakov, René Widera, Jan Stephan,
+ *                Bernhard Manfred Gruber, Antonio Di Pilato, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 
