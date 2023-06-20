@@ -42,8 +42,8 @@ namespace alpaka::detail
         template<typename TViewFwd>
         TaskCopySyclBase(TViewFwd&& viewDst, TViewSrc const& viewSrc, TExtent const& extent)
             : m_extent(getExtentVec(extent))
-            , m_extentWidthBytes(m_extent[TDim::value - 1u] * static_cast<ExtentSize>(sizeof(Elem)))
 #    if(!defined(NDEBUG)) || (ALPAKA_DEBUG >= ALPAKA_DEBUG_FULL)
+            , m_extentWidthBytes(m_extent[TDim::value - 1u] * static_cast<ExtentSize>(sizeof(Elem)))
             , m_dstExtent(getExtentVec(viewDst))
             , m_srcExtent(getExtentVec(viewSrc))
 #    endif
@@ -70,8 +70,8 @@ namespace alpaka::detail
 #    endif
 
         Vec<TDim, ExtentSize> const m_extent;
-        ExtentSize const m_extentWidthBytes;
 #    if(!defined(NDEBUG)) || (ALPAKA_DEBUG >= ALPAKA_DEBUG_FULL)
+        ExtentSize const m_extentWidthBytes;
         Vec<TDim, DstSize> const m_dstExtent;
         Vec<TDim, SrcSize> const m_srcExtent;
 #    endif
@@ -87,12 +87,8 @@ namespace alpaka::detail
     template<typename TDim, typename TViewDst, typename TViewSrc, typename TExtent>
     struct TaskCopySycl : public TaskCopySyclBase<TDim, TViewDst, TViewSrc, TExtent>
     {
-        using DimMin1 = DimInt<TDim::value - 1u>;
-        using typename TaskCopySyclBase<TDim, TViewDst, TViewSrc, TExtent>::ExtentSize;
-        using typename TaskCopySyclBase<TDim, TViewDst, TViewSrc, TExtent>::DstSize;
-        using typename TaskCopySyclBase<TDim, TViewDst, TViewSrc, TExtent>::SrcSize;
-
         using TaskCopySyclBase<TDim, TViewDst, TViewSrc, TExtent>::TaskCopySyclBase;
+        using Elem = alpaka::Elem<TViewSrc>;
 
         ALPAKA_FN_HOST auto operator()(sycl::handler& cgh) const -> void
         {
@@ -106,7 +102,7 @@ namespace alpaka::detail
                 cgh.memcpy(
                     reinterpret_cast<void*>(this->m_dstMemNative),
                     reinterpret_cast<void const*>(this->m_srcMemNative),
-                    static_cast<std::size_t>(this->m_extentWidthBytes * this->m_extent.prod()));
+                    sizeof(Elem) * static_cast<std::size_t>(this->m_extent.prod()));
             }
         }
     };
@@ -117,6 +113,7 @@ namespace alpaka::detail
         : TaskCopySyclBase<DimInt<1u>, TViewDst, TViewSrc, TExtent>
     {
         using TaskCopySyclBase<DimInt<1u>, TViewDst, TViewSrc, TExtent>::TaskCopySyclBase;
+        using Elem = alpaka::Elem<TViewSrc>;
 
         ALPAKA_FN_HOST auto operator()(sycl::handler& cgh) const -> void
         {
@@ -130,7 +127,7 @@ namespace alpaka::detail
                 cgh.memcpy(
                     reinterpret_cast<void*>(this->m_dstMemNative),
                     reinterpret_cast<void const*>(this->m_srcMemNative),
-                    static_cast<std::size_t>(this->m_extentWidthBytes));
+                    sizeof(Elem) * static_cast<std::size_t>(this->m_extent.prod()));
             }
         }
     };
