@@ -4,14 +4,15 @@
 
 #pragma once
 
-#include "alpaka/dev/DevGenericSycl.hpp"
-#include "alpaka/pltf/PltfCpuSyclIntel.hpp"
+#include "alpaka/dev/DevCpuSycl.hpp"
+#include "alpaka/mem/buf/BufGenericSycl.hpp"
 
 #if defined(ALPAKA_ACC_SYCL_ENABLED) && defined(ALPAKA_SYCL_BACKEND_ONEAPI) && defined(ALPAKA_SYCL_ONEAPI_CPU)
 
 namespace alpaka
 {
-    using DevCpuSyclIntel = DevGenericSycl<PltfCpuSyclIntel>;
-} // namespace alpaka
+    template<typename TElem, typename TDim, typename TIdx>
+    using BufCpuSycl = BufGenericSycl<TElem, TDim, TIdx, PltfCpuSycl>;
+}
 
 #endif
