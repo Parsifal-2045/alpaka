@@ -6,12 +6,12 @@
 
 #if defined(ALPAKA_ACC_SYCL_ENABLED) && defined(ALPAKA_SYCL_BACKEND_ONEAPI) && defined(ALPAKA_SYCL_ONEAPI_CPU)
 
-#    include <alpaka/dev/DevCpuSyclIntel.hpp>
-#    include <alpaka/queue/QueueGenericSyclNonBlocking.hpp>
+#    include <alpaka/dev/DevCpuSycl.hpp>
+#    include <alpaka/queue/QueueGenericSyclBlocking.hpp>
 
 namespace alpaka
 {
-    using QueueCpuSyclIntelNonBlocking = QueueGenericSyclNonBlocking<DevCpuSyclIntel>;
+    using QueueCpuSyclBlocking = QueueGenericSyclBlocking<DevCpuSycl>;
 }
 
 #endif
