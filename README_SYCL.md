@@ -49,7 +49,7 @@ The following CMake flags can be set for Intel CPUs:
 
 ### Building for Intel GPUs
 
-* `alpaka_SYCL_ONEAPI_GPU`: set to `ON` to enable compilation for Intel GPUs.
+* `ALPAKA_SYCL_ONEAPI_GPU_INTEL`: set to `ON` to enable compilation for Intel GPUs.
 * `alpaka_SYCL_ONEAPI_GPU_DEVICES`: semicolon-separated list of one or more Intel GPUs to compile for. Check the output of `ocloc compile --help` and look at the possible values for the `-device` argument for valid values to supply here. Default: `bdw`.
 
 ### Building for AMD/Xilinx FPGAs

@@ -31,8 +31,10 @@ namespace alpaka
     using ExampleDefaultAcc = alpaka::AccCpuSycl<TDim, TIdx>;
 #    elif defined(ALPAKA_SYCL_ONEAPI_FPGA)
     using ExampleDefaultAcc = alpaka::AccFpgaSyclIntel<TDim, TIdx>;
-#    elif defined(ALPAKA_SYCL_ONEAPI_GPU)
+#    elif defined(ALPAKA_SYCL_ONEAPI_GPU_INTEL)
     using ExampleDefaultAcc = alpaka::AccGpuSyclIntel<TDim, TIdx>;
+#    elif defined(ALPAKA_SYCL_ONEAPI_GPU_NVIDIA)
+    using ExampleDefaultAcc = alpaka::AccGpuSyclNvidia<TDim, TIdx>;
 #    endif
 #elif defined(ALPAKA_ACC_SYCL_ENABLED) && defined(ALPAKA_SYCL_BACKEND_XILINX)
     using ExampleDefaultAcc = alpaka::AccFpgaSyclXilinx<TDim, TIdx>;

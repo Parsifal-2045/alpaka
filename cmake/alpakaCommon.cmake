@@ -525,7 +525,7 @@ if(alpaka_ACC_SYCL_ENABLE)
     # Possible oneAPI targets
     cmake_dependent_option(alpaka_SYCL_ONEAPI_CPU "Enable oneAPI CPU targets for the SYCL back-end" OFF "alpaka_SYCL_PLATFORM_ONEAPI" OFF)
     cmake_dependent_option(alpaka_SYCL_ONEAPI_FPGA "Enable oneAPI FPGA targets for the SYCL back-end" OFF "alpaka_SYCL_PLATFORM_ONEAPI" OFF)
-    cmake_dependent_option(alpaka_SYCL_ONEAPI_GPU "Enable oneAPI GPU targets for the SYCL back-end" OFF "alpaka_SYCL_PLATFORM_ONEAPI" OFF)
+    cmake_dependent_option(ALPAKA_SYCL_ONEAPI_GPU_INTEL "Enable oneAPI GPU targets for the SYCL back-end" OFF "alpaka_SYCL_PLATFORM_ONEAPI" OFF)
     # Intel FPGA emulation / simulation
     if(alpaka_SYCL_ONEAPI_FPGA)
         set(alpaka_SYCL_ONEAPI_FPGA_MODE "emulation" CACHE STRING "Synthesis type for oneAPI FPGA targets")
@@ -568,7 +568,7 @@ if(alpaka_ACC_SYCL_ENABLE)
             list(APPEND alpaka_SYCL_TARGETS ${alpaka_SYCL_ONEAPI_FPGA_TARGET})
         endif()
 
-        if(alpaka_SYCL_ONEAPI_GPU)
+        if(ALPAKA_SYCL_ONEAPI_GPU_INTEL)
             list(APPEND alpaka_SYCL_TARGETS ${alpaka_SYCL_ONEAPI_GPU_TARGET})
         endif()
 
@@ -629,7 +629,7 @@ if(alpaka_ACC_SYCL_ENABLE)
 
     endif()
 
-    if(alpaka_SYCL_ONEAPI_GPU)
+    if(ALPAKA_SYCL_ONEAPI_GPU_INTEL)
         # Create a drop-down list (in cmake-gui) of valid Intel GPU targets. On the command line the user can specifiy
         # additional targets, such as ranges: "Gen8-Gen12LP" or lists: "icllp;skl".
         set(alpaka_SYCL_ONEAPI_GPU_DEVICES "bdw" CACHE STRING "Intel GPU devices / generations to compile for")
@@ -638,7 +638,7 @@ if(alpaka_ACC_SYCL_ENABLE)
         # If the user has given us a list turn all ';' into ',' to pacify the Intel OpenCL compiler.
         string(REPLACE ";" "," alpaka_SYCL_ONEAPI_GPU_DEVICES "${alpaka_SYCL_ONEAPI_GPU_DEVICES}")
         
-        target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_ONEAPI_GPU")
+        target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_ONEAPI_GPU_INTEL")
         target_link_options(alpaka INTERFACE "SHELL:-Xsycl-target-backend=${alpaka_SYCL_ONEAPI_GPU_TARGET} \"-device ${alpaka_SYCL_ONEAPI_GPU_DEVICES}\"")
     endif()
 
@@ -714,7 +714,7 @@ if(alpaka_ACC_SYCL_ENABLE)
         if(alpaka_SYCL_ONEAPI_FPGA)
             target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_TARGET_FPGA")
         endif()
-        if(alpaka_SYCL_ONEAPI_GPU)
+        if(ALPAKA_SYCL_ONEAPI_GPU_INTEL)
             target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_TARGET_GPU")
         endif()
     endif()

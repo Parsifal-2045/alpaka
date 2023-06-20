@@ -131,8 +131,8 @@ namespace alpaka::test
             static constexpr auto value = false;
         };
 #        endif
-#        ifdef ALPAKA_SYCL_ONEAPI_GPU
-        //! The default queue type trait specialization for the Intel CPU device.
+#        ifdef ALPAKA_SYCL_ONEAPI_GPU_INTEL
+        //! The default queue type trait specialization for the Intel GPU device.
         template<>
         struct DefaultQueueType<alpaka::DevGpuSyclIntel>
         {
@@ -151,6 +151,30 @@ namespace alpaka::test
 
         template<>
         struct IsBlockingQueue<alpaka::QueueGpuSyclIntelNonBlocking>
+        {
+            static constexpr auto value = false;
+        };
+#        endif
+#        ifdef ALPAKA_SYCL_ONEAPI_GPU_NVIDIA
+        //! The default queue type trait specialization for the Nvidia GPU device.
+        template<>
+        struct DefaultQueueType<alpaka::DevGpuSyclNvidia>
+        {
+#            if(ALPAKA_DEBUG >= ALPAKA_DEBUG_FULL)
+            using type = alpaka::QueueGpuSyclNvidiaBlocking;
+#            else
+            using type = alpaka::QueueGpuSyclNvidiaNonBlocking;
+#            endif
+        };
+
+        template<>
+        struct IsBlockingQueue<alpaka::QueueGpuSyclNvidiaBlocking>
+        {
+            static constexpr auto value = true;
+        };
+
+        template<>
+        struct IsBlockingQueue<alpaka::QueueGpuSyclNvidiaNonBlocking>
         {
             static constexpr auto value = false;
         };
@@ -212,10 +236,15 @@ namespace alpaka::test
         std::tuple<alpaka::DevFpgaSyclIntel, alpaka::QueueFpgaSyclIntelBlocking>,
         std::tuple<alpaka::DevFpgaSyclIntel, alpaka::QueueFpgaSyclIntelNonBlocking>
 #        endif
-#        ifdef ALPAKA_SYCL_ONEAPI_GPU
+#        ifdef ALPAKA_SYCL_ONEAPI_GPU_INTEL
         ,
         std::tuple<alpaka::DevGpuSyclIntel, alpaka::QueueGpuSyclIntelBlocking>,
         std::tuple<alpaka::DevGpuSyclIntel, alpaka::QueueGpuSyclIntelNonBlocking>
+#        endif
+#        ifdef ALPAKA_SYCL_ONEAPI_GPU_NVIDIA
+        ,
+        std::tuple<alpaka::DevGpuSyclNvidia, alpaka::QueueGpuSyclNvidiaBlocking>,
+        std::tuple<alpaka::DevGpuSyclNvidia, alpaka::QueueGpuSyclNvidiaNonBlocking>
 #        endif
 #    endif
 #    if defined(ALPAKA_SYCL_BACKEND_XILINX)
