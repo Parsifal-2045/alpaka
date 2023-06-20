@@ -1,4 +1,4 @@
-/* Copyright 2023 Aurora Perego
+/* Copyright 2023 Luca Ferragina, Aurora Perego, Jan Stephan
  * SPDX-License-Identifier: MPL-2.0
  */
 

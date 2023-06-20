@@ -1,4 +1,4 @@
-/* Copyright 2022 Benjamin Worpitz, Jan Stephan
+/* Copyright 2022 Benjamin Worpitz, Jan Stephan, Aurora Perego
  * SPDX-License-Identifier: MPL-2.0
  */
 

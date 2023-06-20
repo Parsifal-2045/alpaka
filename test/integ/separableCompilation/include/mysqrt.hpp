@@ -1,4 +1,4 @@
-/* Copyright 2019 Benjamin Worpitz
+/* Copyright 2022 Benjamin Worpitz, Luca Ferragina
  * SPDX-License-Identifier: MPL-2.0
  */
 
