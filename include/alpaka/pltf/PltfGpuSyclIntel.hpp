@@ -1,4 +1,4 @@
-/* Copyright 2023 Jan Stephan
+/* Copyright 2023 Jan Stephan, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 
@@ -19,13 +19,7 @@ namespace alpaka
 {
     namespace detail
     {
-        // Prevent clang from annoying us with warnings about emitting too many vtables. These are discarded by the
-        // linker anyway.
-#    if BOOST_COMP_CLANG
-#        pragma clang diagnostic push
-#        pragma clang diagnostic ignored "-Wweak-vtables"
-#    endif
-        struct IntelGpuSelector final
+        struct IntelGpuSelector
         {
             auto operator()(sycl::device const& dev) const -> int
             {
@@ -35,9 +29,6 @@ namespace alpaka
                 return is_intel_gpu ? 1 : -1;
             }
         };
-#    if BOOST_COMP_CLANG
-#        pragma clang diagnostic pop
-#    endif
     } // namespace detail
 
     //! The SYCL device manager.

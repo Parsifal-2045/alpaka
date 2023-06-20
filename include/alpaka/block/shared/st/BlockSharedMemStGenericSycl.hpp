@@ -1,4 +1,4 @@
-/* Copyright 2022 Jan Stephan
+/* Copyright 2023 Jan Stephan, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 
@@ -12,6 +12,7 @@
 
 #    include <CL/sycl.hpp>
 
+#    include <cstddef>
 #    include <cstdint>
 
 namespace alpaka

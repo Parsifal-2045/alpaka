@@ -1,4 +1,4 @@
-/* Copyright 2022 Jan Stephan, Antonio Di Pilato
+/* Copyright 2023 Jan Stephan, Antonio Di Pilato, Luca Ferragina, Aurora Perego, Andrea Bocci
  * SPDX-License-Identifier: MPL-2.0
  */
 

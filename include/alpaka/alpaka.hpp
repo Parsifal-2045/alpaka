@@ -1,5 +1,5 @@
 /* Copyright 2023 Axel Hübl, Benjamin Worpitz, Erik Zenker, Matthias Werner, René Widera, Bernhard Manfred Gruber,
- *                Jan Stephan, Antonio Di Pilato
+ *                Jan Stephan, Antonio Di Pilato, Luca Ferragina, Aurora Perego
  * SPDX-License-Identifier: MPL-2.0
  */
 
