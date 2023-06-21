@@ -255,6 +255,27 @@ namespace alpaka
             return foldrAll(meta::max<TVal>(), std::numeric_limits<TVal>::min());
         }
 
+        //! \return True if all values are true, i.e., the "logcal and" of all values.
+        ALPAKA_NO_HOST_ACC_WARNING
+        [[nodiscard]] ALPAKA_FN_HOST_ACC constexpr auto all() const -> bool
+        {
+            return foldrAll(std::logical_and<TVal>(), true);
+        }
+
+        //! \return True if any value is true, i.e., the "logcal or" of all values.
+        ALPAKA_NO_HOST_ACC_WARNING
+        [[nodiscard]] ALPAKA_FN_HOST_ACC constexpr auto any() const -> bool
+        {
+            return foldrAll(std::logical_or<TVal>(), false);
+        }
+
+        //! \return True if none of the values are true
+        ALPAKA_NO_HOST_ACC_WARNING
+        [[nodiscard]] ALPAKA_FN_HOST_ACC constexpr auto none() const -> bool
+        {
+            return ! foldrAll(std::logical_or<TVal>(), false);
+        }
+
         //! \return The index of the minimal element.
         [[nodiscard]] ALPAKA_FN_HOST constexpr auto minElem() const -> typename TDim::value_type
         {
@@ -408,6 +429,32 @@ namespace alpaka
             {
                 for(typename TDim::value_type i = 0; i < TDim::value; ++i)
                     r[i] = p[i] >= q[i];
+            }
+            return r;
+        }
+
+        //! \return The element-wise logical and relation of two vectors.
+        ALPAKA_NO_HOST_ACC_WARNING
+        ALPAKA_FN_HOST_ACC friend constexpr auto operator&&(Vec const& p, Vec const& q) -> Vec<TDim, bool>
+        {
+            Vec<TDim, bool> r;
+            if constexpr(TDim::value > 0)
+            {
+                for(typename TDim::value_type i = 0; i < TDim::value; ++i)
+                    r[i] = p[i] && q[i];
+            }
+            return r;
+        }
+
+        //! \return The element-wise logical or relation of two vectors.
+        ALPAKA_NO_HOST_ACC_WARNING
+        ALPAKA_FN_HOST_ACC friend constexpr auto operator||(Vec const& p, Vec const& q) -> Vec<TDim, bool>
+        {
+            Vec<TDim, bool> r;
+            if constexpr(TDim::value > 0)
+            {
+                for(typename TDim::value_type i = 0; i < TDim::value; ++i)
+                    r[i] = p[i] || q[i];
             }
             return r;
         }
