@@ -77,7 +77,7 @@ auto main() -> int
     // using Acc = alpaka::AccCpuSerial<Dim, Idx>;
     // using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
 
-    using Acc = alpaka::AccGpuSyclIntel<Dim, Idx>;
+    using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
     using Pltf = alpaka::Pltf<Acc>;
     using DevAcc = alpaka::Dev<Acc>;
     std::cout << "Using alpaka accelerator: " << alpaka::getAccName<Acc>() << std::endl;

@@ -113,21 +113,21 @@ namespace alpaka
         VecType extents;
     };
 
-    namespace experimental::trait
-    {
-        template<typename TElem, typename TDim, typename TIdx, typename TDev>
-        struct BuildAccessor<BufGenericSycl<TElem, TDim, TIdx, TDev>>
-        {
-            template<typename... TAccessModes>
-            static auto buildAccessor(BufGenericSycl<TElem, TDim, TIdx, TDev>& buffer)
-            {
-                using SyclAccessor = detail::SyclAccessor<TElem, TDim::value, TAccessModes...>;
-                return Accessor<SyclAccessor, TElem, TIdx, TDim::value, TAccessModes...>{
-                    SyclAccessor{buffer.m_buffer},
-                    buffer.m_extentElements};
-            }
-        };
-    } // namespace experimental::trait
+//    namespace experimental::trait
+//    {
+//        template<typename TElem, typename TDim, typename TIdx, typename TDev>
+//        struct BuildAccessor<BufGenericSycl<TElem, TDim, TIdx, TDev>>
+//        {
+//            template<typename... TAccessModes>
+//            static auto buildAccessor(BufGenericSycl<TElem, TDim, TIdx, TDev>& buffer)
+//            {
+//                using SyclAccessor = detail::SyclAccessor<TElem, TDim::value, TAccessModes...>;
+//                return Accessor<SyclAccessor, TElem, TIdx, TDim::value, TAccessModes...>{
+//                    SyclAccessor{buffer.m_buffer},
+//                    buffer.m_extentElements};
+//            }
+//        };
+//    } // namespace experimental::trait
 } // namespace alpaka
 
 #endif
