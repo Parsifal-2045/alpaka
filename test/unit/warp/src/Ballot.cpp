@@ -26,6 +26,7 @@ struct BallotSingleThreadWarpTestKernel
     }
 };
 
+template <std::uint32_t TWarpSize>
 struct BallotMultipleThreadWarpTestKernel
 {
     ALPAKA_NO_HOST_ACC_WARNING
@@ -65,6 +66,15 @@ struct BallotMultipleThreadWarpTestKernel
     }
 };
 
+namespace alpaka::trait
+{
+    template<std::uint32_t TWarpSize, typename TAcc>
+    struct WarpSize<BallotMultipleThreadWarpTestKernel<TWarpSize>, TAcc>
+    {
+        static constexpr std::uint32_t warp_size = TWarpSize;
+    };
+} // namespace alpaka::trait
+
 TEMPLATE_LIST_TEST_CASE("ballot", "[warp]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
@@ -93,8 +103,15 @@ TEMPLATE_LIST_TEST_CASE("ballot", "[warp]", alpaka::test::TestAccs)
             auto const threadElementExtent = alpaka::Vec<Dim, Idx>::ones();
             auto workDiv = typename ExecutionFixture::WorkDiv{gridBlockExtent, blockThreadExtent, threadElementExtent};
             auto fixture = ExecutionFixture{workDiv};
-            BallotMultipleThreadWarpTestKernel kernel;
-            REQUIRE(fixture(kernel));
+            if (warpExtent == 8) {
+              REQUIRE(fixture(BallotMultipleThreadWarpTestKernel<8>{}));
+            } else
+            if (warpExtent == 16) {
+              REQUIRE(fixture(BallotMultipleThreadWarpTestKernel<16>{}));
+            } else
+            if (warpExtent == 32) {
+              REQUIRE(fixture(BallotMultipleThreadWarpTestKernel<32>{}));
+            }
         }
     }
 }
