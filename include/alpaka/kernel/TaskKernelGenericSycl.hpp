@@ -1,4 +1,4 @@
-/* Copyright 2023 Jan Stephan, Andrea Bocci, Luca Ferragina
+/* Copyright 2023 Jan Stephan, Andrea Bocci, Luca Ferragina, Aurora Perego
  * SPDX-License-Identifier: MPL-2.0
  */
 
@@ -29,7 +29,82 @@
 
 #ifdef ALPAKA_ACC_SYCL_ENABLED
 
+#    include "alpaka/kernel/sycl_subgroup_size.h"
+
 #    include <CL/sycl.hpp>
+
+#    if(SYCL_SUBGROUP_SIZE & 4)
+#        define REQUIRED_SUB_GROUP_SIZE_4 [[intel::reqd_sub_group_size(4)]]
+#    else
+#        define REQUIRED_SUB_GROUP_SIZE_4
+#    endif
+#    if(SYCL_SUBGROUP_SIZE & 8)
+#        define REQUIRED_SUB_GROUP_SIZE_8 [[intel::reqd_sub_group_size(8)]]
+#    else
+#        define REQUIRED_SUB_GROUP_SIZE_8
+#    endif
+#    if(SYCL_SUBGROUP_SIZE & 16)
+#        define REQUIRED_SUB_GROUP_SIZE_16 [[intel::reqd_sub_group_size(16)]]
+#    else
+#        define REQUIRED_SUB_GROUP_SIZE_16
+#    endif
+#    if(SYCL_SUBGROUP_SIZE & 32)
+#        define REQUIRED_SUB_GROUP_SIZE_32 [[intel::reqd_sub_group_size(32)]]
+#    else
+#        define REQUIRED_SUB_GROUP_SIZE_32
+#    endif
+#    if(SYCL_SUBGROUP_SIZE & 64)
+#        define REQUIRED_SUB_GROUP_SIZE_64 [[intel::reqd_sub_group_size(64)]]
+#    else
+#        define REQUIRED_SUB_GROUP_SIZE_64
+#    endif
+
+#    define REQUIRED_SUB_GROUP_SIZE_0
+
+#    ifdef ALPAKA_SYCL_IOSTREAM_ENABLED
+
+#        define LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(N)                                                             \
+            if constexpr(trait::WarpSize<TKernelFnObj, TAcc>::warp_size == N)                                         \
+            {                                                                                                         \
+                cgh.parallel_for(                                                                                     \
+                    sycl::nd_range<TDim::value>{global_size, local_size},                                             \
+                    [=](sycl::nd_item<TDim::value> work_item) REQUIRED_SUB_GROUP_SIZE_##N {                           \
+                        auto acc = TAcc{                                                                              \
+                            item_elements,                                                                            \
+                            work_item,                                                                                \
+                            dyn_shared_accessor,                                                                      \
+                            st_shared_accessor,                                                                       \
+                            global_fence_dummy,                                                                       \
+                            local_fence_dummy,                                                                        \
+                            output_stream};                                                                           \
+                        core::apply(                                                                                  \
+                            [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },    \
+                            k_args);                                                                                  \
+                    });                                                                                               \
+            }
+
+#    else
+
+#        define LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(N)                                                             \
+            if constexpr(trait::WarpSize<TKernelFnObj, TAcc>::warp_size == N)                                         \
+            {                                                                                                         \
+                cgh.parallel_for(                                                                                     \
+                    sycl::nd_range<TDim::value>{global_size, local_size},                                             \
+                    [=](sycl::nd_item<TDim::value> work_item) REQUIRED_SUB_GROUP_SIZE_##N {                           \
+                        auto acc = TAcc{                                                                              \
+                            item_elements,                                                                            \
+                            work_item,                                                                                \
+                            dyn_shared_accessor,                                                                      \
+                            st_shared_accessor,                                                                       \
+                            global_fence_dummy,                                                                       \
+                            local_fence_dummy};                                                                       \
+                        core::apply(                                                                                  \
+                            [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },    \
+                            k_args);                                                                                  \
+                    });                                                                                               \
+            }
+
+#    endif
 
 namespace alpaka::detail
 {
@@ -136,63 +211,17 @@ namespace alpaka
 
             auto output_stream = sycl::stream{buf_size, buf_per_work_item, cgh};
 #    endif
-            if constexpr(trait::WarpSize<TKernelFnObj, TAcc>::warp_size != 0) {
-            // cgh.parallel_for<detail::kernel<TAcc, TKernelFnObj, TArgs...>>( //FIXME_
-            cgh.parallel_for(
-                sycl::nd_range<TDim::value>{global_size, local_size},
-                [=](sycl::nd_item<TDim::value> work_item) [[intel::reqd_sub_group_size(trait::WarpSize<TKernelFnObj, TAcc>::warp_size)]]
-                {
-#    ifdef ALPAKA_SYCL_IOSTREAM_ENABLED
-                    auto acc = TAcc{
-                        item_elements,
-                        work_item,
-                        dyn_shared_accessor,
-                        st_shared_accessor,
-                        global_fence_dummy,
-                        local_fence_dummy,
-                        output_stream};
-#    else
-                    auto acc = TAcc{
-                        item_elements,
-                        work_item,
-                        dyn_shared_accessor,
-                        st_shared_accessor,
-                        global_fence_dummy,
-                        local_fence_dummy};
-#    endif
-                    core::apply(
-                        [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },
-                        k_args);
-                });
-                } else {  // autodetect
-            // cgh.parallel_for<detail::kernel<TAcc, TKernelFnObj, TArgs...>>( //FIXME_
-            cgh.parallel_for(
-                sycl::nd_range<TDim::value>{global_size, local_size},
-                [=](sycl::nd_item<TDim::value> work_item)
-                {
-#    ifdef ALPAKA_SYCL_IOSTREAM_ENABLED
-                    auto acc = TAcc{
-                        item_elements,
-                        work_item,
-                        dyn_shared_accessor,
-                        st_shared_accessor,
-                        global_fence_dummy,
-                        local_fence_dummy,
-                        output_stream};
-#    else
-                    auto acc = TAcc{
-                        item_elements,
-                        work_item,
-                        dyn_shared_accessor,
-                        st_shared_accessor,
-                        global_fence_dummy,
-                        local_fence_dummy};
-#    endif
-                    core::apply(
-                        [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },
-                        k_args);
-                });
-                 }
+            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(4)
+              else
+            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(8)
+              else
+            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(16)
+              else
+            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(32)
+              else
+            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(64)
+              else
+            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(0)
         }
 
         static constexpr auto is_sycl_task = true;
@@ -273,5 +302,7 @@ namespace alpaka::trait
         using type = TIdx;
     };
 } // namespace alpaka::trait
+
+#    undef LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS
 
 #endif

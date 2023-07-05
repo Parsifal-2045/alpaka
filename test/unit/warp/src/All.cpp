@@ -25,7 +25,7 @@ struct AllSingleThreadWarpTestKernel
     }
 };
 
-template <std::uint32_t TWarpSize>
+template<std::uint32_t TWarpSize>
 struct AllMultipleThreadWarpTestKernel
 {
     ALPAKA_NO_HOST_ACC_WARNING
@@ -95,14 +95,25 @@ TEMPLATE_LIST_TEST_CASE("all", "[warp]", alpaka::test::TestAccs)
             auto const threadElementExtent = alpaka::Vec<Dim, Idx>::ones();
             auto workDiv = typename ExecutionFixture::WorkDiv{gridBlockExtent, blockThreadExtent, threadElementExtent};
             auto fixture = ExecutionFixture{workDiv};
-            if (warpExtent == 8) {
-              REQUIRE(fixture(AllMultipleThreadWarpTestKernel<8>{}));
-            } else
-            if (warpExtent == 16) {
-              REQUIRE(fixture(AllMultipleThreadWarpTestKernel<16>{}));
-            } else
-            if (warpExtent == 32) {
-              REQUIRE(fixture(AllMultipleThreadWarpTestKernel<32>{}));
+            if(warpExtent == 4)
+            {
+                REQUIRE(fixture(AllMultipleThreadWarpTestKernel<4>{}));
+            }
+            else if(warpExtent == 8)
+            {
+                REQUIRE(fixture(AllMultipleThreadWarpTestKernel<8>{}));
+            }
+            else if(warpExtent == 16)
+            {
+                REQUIRE(fixture(AllMultipleThreadWarpTestKernel<16>{}));
+            }
+            else if(warpExtent == 32)
+            {
+                REQUIRE(fixture(AllMultipleThreadWarpTestKernel<32>{}));
+            }
+            else if(warpExtent == 64)
+            {
+                REQUIRE(fixture(AllMultipleThreadWarpTestKernel<64>{}));
             }
         }
     }

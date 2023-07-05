@@ -560,7 +560,7 @@ if(alpaka_ACC_SYCL_ENABLE)
         # Determine SYCL targets
         set(alpaka_SYCL_ONEAPI_CPU_TARGET "spir64_x86_64")
         set(alpaka_SYCL_ONEAPI_FPGA_TARGET "spir64_fpga")
-        set(alpaka_SYCL_ONEAPI_GPU_TARGET "spir64_gen")
+        set(alpaka_SYCL_ONEAPI_GPU_TARGET ${alpaka_SYCL_ONEAPI_GPU_DEVICES})
 
         if(alpaka_SYCL_ONEAPI_CPU)
             list(APPEND alpaka_SYCL_TARGETS ${alpaka_SYCL_ONEAPI_CPU_TARGET})
@@ -628,7 +628,7 @@ if(alpaka_ACC_SYCL_ENABLE)
             string(REPLACE ";" "," alpaka_SYCL_ONEAPI_GPU_DEVICES "${alpaka_SYCL_ONEAPI_GPU_DEVICES}")
             
             target_compile_definitions(alpaka INTERFACE "ALPAKA_SYCL_ONEAPI_GPU")
-            target_link_options(alpaka INTERFACE "SHELL:-Xsycl-target-backend=${alpaka_SYCL_ONEAPI_GPU_TARGET} \"-device ${alpaka_SYCL_ONEAPI_GPU_DEVICES}\"")
+            #target_link_options(alpaka INTERFACE "SHELL:-Xsycl-target-backend=${alpaka_SYCL_ONEAPI_GPU_TARGET} \"-device ${alpaka_SYCL_ONEAPI_GPU_DEVICES}\"")
         endif()
 
         #-----------------------------------------------------------------------------------------------------------------

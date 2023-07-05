@@ -25,7 +25,7 @@ struct ActivemaskSingleThreadWarpTestKernel
     }
 };
 
-template <std::uint32_t TWarpSize>
+template<std::uint32_t TWarpSize>
 struct ActivemaskMultipleThreadWarpTestKernel
 {
     ALPAKA_NO_HOST_ACC_WARNING
@@ -91,20 +91,40 @@ TEMPLATE_LIST_TEST_CASE("activemask", "[warp]", alpaka::test::TestAccs)
             auto const threadElementExtent = alpaka::Vec<Dim, Idx>::ones();
             auto workDiv = typename ExecutionFixture::WorkDiv{gridBlockExtent, blockThreadExtent, threadElementExtent};
             auto fixture = ExecutionFixture{workDiv};
-            if (warpExtent == 8) {
-              for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++) {
-                  CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<8>{}, inactiveThreadIdx));
-              }
-            } else
-            if (warpExtent == 16) {
-              for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++) {
-                  CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<16>{}, inactiveThreadIdx));
-              }
-            } else
-            if (warpExtent == 32) {
-              for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++) {
-                  CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<32>{}, inactiveThreadIdx));
-              }
+            if(warpExtent == 4)
+            {
+                for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++)
+                {
+                    CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<4>{}, inactiveThreadIdx));
+                }
+            }
+            else if(warpExtent == 8)
+            {
+                for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++)
+                {
+                    CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<8>{}, inactiveThreadIdx));
+                }
+            }
+            else if(warpExtent == 16)
+            {
+                for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++)
+                {
+                    CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<16>{}, inactiveThreadIdx));
+                }
+            }
+            else if(warpExtent == 32)
+            {
+                for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++)
+                {
+                    CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<32>{}, inactiveThreadIdx));
+                }
+            }
+            else if(warpExtent == 64)
+            {
+                for(auto inactiveThreadIdx = 0u; inactiveThreadIdx < warpExtent; inactiveThreadIdx++)
+                {
+                    CHECK(fixture(ActivemaskMultipleThreadWarpTestKernel<64>{}, inactiveThreadIdx));
+                }
             }
         }
     }
