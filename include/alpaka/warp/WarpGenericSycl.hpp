@@ -19,11 +19,11 @@ namespace alpaka::warp
     class WarpGenericSycl : public concepts::Implements<alpaka::warp::ConceptWarp, WarpGenericSycl<TDim>>
     {
     public:
-        WarpGenericSycl(sycl::nd_item<TDim::value> my_item) : m_item{my_item}
+        WarpGenericSycl(sycl::nd_item<TDim::value> my_item) : m_item_warp{my_item}
         {
         }
 
-        sycl::nd_item<TDim::value> m_item;
+        sycl::nd_item<TDim::value> m_item_warp;
     };
 } // namespace alpaka::warp
 
@@ -34,7 +34,7 @@ namespace alpaka::warp::trait
     {
         static auto getSize(warp::WarpGenericSycl<TDim> const& warp) -> std::int32_t
         {
-            auto const sub_group = warp.m_item.get_sub_group();
+            auto const sub_group = warp.m_item_warp.get_sub_group();
             // SYCL sub-groups are always 1D
             return static_cast<std::int32_t>(sub_group.get_max_local_range()[0]);
         }
@@ -48,7 +48,7 @@ namespace alpaka::warp::trait
         {
             // SYCL has no way of querying this. Since sub-group functions have to be executed in convergent code
             // regions anyway we return the full mask.
-            auto const sub_group = warp.m_item.get_sub_group();
+            auto const sub_group = warp.m_item_warp.get_sub_group();
             auto const mask = sycl::ext::oneapi::group_ballot(sub_group, true);
             // FIXME This should be std::uint64_t on AMD GCN architectures.
             std::uint32_t bits = 0;
@@ -62,7 +62,7 @@ namespace alpaka::warp::trait
     {
         static auto all(warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::int32_t
         {
-            auto const sub_group = warp.m_item.get_sub_group();
+            auto const sub_group = warp.m_item_warp.get_sub_group();
             return static_cast<std::int32_t>(sycl::all_of_group(sub_group, static_cast<bool>(predicate)));
         }
     };
@@ -72,7 +72,7 @@ namespace alpaka::warp::trait
     {
         static auto any(warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::int32_t
         {
-            auto const sub_group = warp.m_item.get_sub_group();
+            auto const sub_group = warp.m_item_warp.get_sub_group();
             return static_cast<std::int32_t>(sycl::any_of_group(sub_group, static_cast<bool>(predicate)));
         }
     };
@@ -83,7 +83,7 @@ namespace alpaka::warp::trait
         // FIXME This should be std::uint64_t on AMD GCN architectures.
         static auto ballot(warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::uint32_t
         {
-            auto const sub_group = warp.m_item.get_sub_group();
+            auto const sub_group = warp.m_item_warp.get_sub_group();
             auto const mask = sycl::ext::oneapi::group_ballot(sub_group, static_cast<bool>(predicate));
             // FIXME This should be std::uint64_t on AMD GCN architectures.
             std::uint32_t bits = 0;
@@ -108,7 +108,7 @@ namespace alpaka::warp::trait
                Example: If we assume a sub-group size of 32 and a width of 16 we will receive two subdivisions:
                The first starts at sub-group index 0 and the second at sub-group index 16. For srcLane = 4 the
                first subdivision will access the value at sub-group index 4 and the second at sub-group index 20. */
-            auto const actual_group = warp.m_item.get_sub_group();
+            auto const actual_group = warp.m_item_warp.get_sub_group();
             auto const actual_item_id = static_cast<std::int32_t>(actual_group.get_local_linear_id());
             auto const actual_group_id = actual_item_id / width;
             auto const actual_src_id = static_cast<std::size_t>(srcLane + actual_group_id * width);

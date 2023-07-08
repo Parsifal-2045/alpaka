@@ -23,12 +23,12 @@ namespace alpaka
 
         WorkDivGenericSycl(Vec<TDim, TIdx> const& threadElemExtent, sycl::nd_item<TDim::value> work_item)
             : m_threadElemExtent{threadElemExtent}
-            , my_item{work_item}
+            , m_item_workdiv{work_item}
         {
         }
 
         Vec<TDim, TIdx> const& m_threadElemExtent;
-        sycl::nd_item<TDim::value> my_item;
+        sycl::nd_item<TDim::value> m_item_workdiv;
     };
 } // namespace alpaka
 
@@ -58,19 +58,19 @@ namespace alpaka::trait
             if constexpr(TDim::value == 0)
                 return Vec<TDim, TIdx>{};
             else if constexpr(TDim::value == 1)
-                return Vec<TDim, TIdx>{static_cast<TIdx>(workDiv.my_item.get_group_range(0))};
+                return Vec<TDim, TIdx>{static_cast<TIdx>(workDiv.m_item_workdiv.get_group_range(0))};
             else if constexpr(TDim::value == 2)
             {
                 return Vec<TDim, TIdx>{
-                    static_cast<TIdx>(workDiv.my_item.get_group_range(1)),
-                    static_cast<TIdx>(workDiv.my_item.get_group_range(0))};
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_group_range(1)),
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_group_range(0))};
             }
             else
             {
                 return Vec<TDim, TIdx>{
-                    static_cast<TIdx>(workDiv.my_item.get_group_range(2)),
-                    static_cast<TIdx>(workDiv.my_item.get_group_range(1)),
-                    static_cast<TIdx>(workDiv.my_item.get_group_range(0))};
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_group_range(2)),
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_group_range(1)),
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_group_range(0))};
             }
         }
     };
@@ -85,19 +85,19 @@ namespace alpaka::trait
             if constexpr(TDim::value == 0)
                 return Vec<TDim, TIdx>{};
             else if constexpr(TDim::value == 1)
-                return Vec<TDim, TIdx>{static_cast<TIdx>(workDiv.my_item.get_local_range(0))};
+                return Vec<TDim, TIdx>{static_cast<TIdx>(workDiv.m_item_workdiv.get_local_range(0))};
             else if constexpr(TDim::value == 2)
             {
                 return Vec<TDim, TIdx>{
-                    static_cast<TIdx>(workDiv.my_item.get_local_range(1)),
-                    static_cast<TIdx>(workDiv.my_item.get_local_range(0))};
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_local_range(1)),
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_local_range(0))};
             }
             else
             {
                 return Vec<TDim, TIdx>{
-                    static_cast<TIdx>(workDiv.my_item.get_local_range(2)),
-                    static_cast<TIdx>(workDiv.my_item.get_local_range(1)),
-                    static_cast<TIdx>(workDiv.my_item.get_local_range(0))};
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_local_range(2)),
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_local_range(1)),
+                    static_cast<TIdx>(workDiv.m_item_workdiv.get_local_range(0))};
             }
         }
     };

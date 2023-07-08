@@ -41,11 +41,11 @@ namespace alpaka::rand
     class RandGenericSycl : public concepts::Implements<ConceptRand, RandGenericSycl<TDim>>
     {
     public:
-        RandGenericSycl(sycl::nd_item<TDim::value> my_item) : m_item{my_item}
+        RandGenericSycl(sycl::nd_item<TDim::value> my_item) : m_item_rand{my_item}
         {
         }
 
-        sycl::nd_item<TDim::value> m_item;
+        sycl::nd_item<TDim::value> m_item_rand;
     };
 
 #    if !defined(ALPAKA_HOST_ONLY)
@@ -77,7 +77,7 @@ namespace alpaka::rand
 
             Minstd(RandGenericSycl<TDim> rand, std::uint32_t const& seed)
             {
-                oneapi::dpl::minstd_rand engine(seed, rand.m_item.get_global_linear_id());
+                oneapi::dpl::minstd_rand engine(seed, rand.m_item_rand.get_global_linear_id());
                 rng_engine = engine;
             }
 
