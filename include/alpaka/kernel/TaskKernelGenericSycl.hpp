@@ -30,45 +30,16 @@
 #ifdef ALPAKA_ACC_SYCL_ENABLED
 
 #    include "alpaka/kernel/sycl_subgroup_size.h"
-
 #    include <CL/sycl.hpp>
-
-#    if(SYCL_SUBGROUP_SIZE & 4)
-#        define REQUIRED_SUB_GROUP_SIZE_4 [[intel::reqd_sub_group_size(4)]]
-#    else
-#        define REQUIRED_SUB_GROUP_SIZE_4
-#    endif
-#    if(SYCL_SUBGROUP_SIZE & 8)
-#        define REQUIRED_SUB_GROUP_SIZE_8 [[intel::reqd_sub_group_size(8)]]
-#    else
-#        define REQUIRED_SUB_GROUP_SIZE_8
-#    endif
-#    if(SYCL_SUBGROUP_SIZE & 16)
-#        define REQUIRED_SUB_GROUP_SIZE_16 [[intel::reqd_sub_group_size(16)]]
-#    else
-#        define REQUIRED_SUB_GROUP_SIZE_16
-#    endif
-#    if(SYCL_SUBGROUP_SIZE & 32)
-#        define REQUIRED_SUB_GROUP_SIZE_32 [[intel::reqd_sub_group_size(32)]]
-#    else
-#        define REQUIRED_SUB_GROUP_SIZE_32
-#    endif
-#    if(SYCL_SUBGROUP_SIZE & 64)
-#        define REQUIRED_SUB_GROUP_SIZE_64 [[intel::reqd_sub_group_size(64)]]
-#    else
-#        define REQUIRED_SUB_GROUP_SIZE_64
-#    endif
-
-#    define REQUIRED_SUB_GROUP_SIZE_0
 
 #    ifdef ALPAKA_SYCL_IOSTREAM_ENABLED
 
-#        define LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(N)                                                             \
-            if constexpr(trait::WarpSize<TKernelFnObj, TAcc>::warp_size == N)                                         \
-            {                                                                                                         \
+#        define LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(sub_group_size)                                                \
                 cgh.parallel_for(                                                                                     \
                     sycl::nd_range<TDim::value>{global_size, local_size},                                             \
-                    [=](sycl::nd_item<TDim::value> work_item) REQUIRED_SUB_GROUP_SIZE_##N {                           \
+                    [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,       \
+		     output_stream,k_func,k_args](sycl::nd_item<TDim::value> work_item)                               \
+                    [[intel::reqd_sub_group_size(sub_group_size)]] {                                                  \
                         auto acc = TAcc{                                                                              \
                             item_elements,                                                                            \
                             work_item,                                                                                \
@@ -80,17 +51,42 @@
                         core::apply(                                                                                  \
                             [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },    \
                             k_args);                                                                                  \
-                    });                                                                                               \
-            }
+                    });
+
+#        define LAUNCH_SYCL_KERNEL_WITH_DEFAULT_SUBGROUP_SIZE                                                         \
+                cgh.parallel_for(                                                                                     \
+                    sycl::nd_range<TDim::value>{global_size, local_size},                                             \
+                    [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,       \
+		     output_stream,k_func,k_args](sycl::nd_item<TDim::value> work_item) {                             \
+                        auto acc = TAcc{                                                                              \
+                            item_elements,                                                                            \
+                            work_item,                                                                                \
+                            dyn_shared_accessor,                                                                      \
+                            st_shared_accessor,                                                                       \
+                            global_fence_dummy,                                                                       \
+                            local_fence_dummy,                                                                        \
+                            output_stream};                                                                           \
+                        core::apply(                                                                                  \
+                            [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },    \
+                            k_args);                                                                                  \
+                    });
+
+#        define LAUNCH_EMPTY_SYCL_KERNEL                                                                              \
+                throw sycl::errc::kernel_not_supported;                                                               \
+                cgh.parallel_for(                                                                                     \
+                    sycl::nd_range<TDim::value>{global_size, local_size},                                             \
+                    [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,       \
+		     output_stream,k_func,k_args](sycl::nd_item<TDim::value> work_item) {                             \
+                    });
 
 #    else
 
-#        define LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(N)                                                             \
-            if constexpr(trait::WarpSize<TKernelFnObj, TAcc>::warp_size == N)                                         \
-            {                                                                                                         \
+#        define LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(sub_group_size)                                                \
                 cgh.parallel_for(                                                                                     \
                     sycl::nd_range<TDim::value>{global_size, local_size},                                             \
-                    [=](sycl::nd_item<TDim::value> work_item) REQUIRED_SUB_GROUP_SIZE_##N {                           \
+                    [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,       \
+                     k_func,k_args](sycl::nd_item<TDim::value> work_item)                                             \
+                    [[intel::reqd_sub_group_size(sub_group_size)]] {                                                  \
                         auto acc = TAcc{                                                                              \
                             item_elements,                                                                            \
                             work_item,                                                                                \
@@ -101,8 +97,32 @@
                         core::apply(                                                                                  \
                             [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },    \
                             k_args);                                                                                  \
-                    });                                                                                               \
-            }
+                    });
+
+#        define LAUNCH_SYCL_KERNEL_WITH_DEFAULT_SUBGROUP_SIZE                                                         \
+                cgh.parallel_for(                                                                                     \
+                    sycl::nd_range<TDim::value>{global_size, local_size},                                             \
+                    [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,       \
+                     k_func,k_args](sycl::nd_item<TDim::value> work_item) {                                           \
+                        auto acc = TAcc{                                                                              \
+                            item_elements,                                                                            \
+                            work_item,                                                                                \
+                            dyn_shared_accessor,                                                                      \
+                            st_shared_accessor,                                                                       \
+                            global_fence_dummy,                                                                       \
+                            local_fence_dummy};                                                                       \
+                        core::apply(                                                                                  \
+                            [k_func, &acc](typename std::decay_t<TArgs> const&... args) { k_func(acc, args...); },    \
+                            k_args);                                                                                  \
+                    });
+
+#        define LAUNCH_EMPTY_SYCL_KERNEL                                                                              \
+                throw sycl::errc::kernel_not_supported;                                                               \
+                cgh.parallel_for(                                                                                     \
+                    sycl::nd_range<TDim::value>{global_size, local_size},                                             \
+                   [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,        \
+                    k_func,k_args] (sycl::nd_item<TDim::value> work_item) {                                           \
+                    });
 
 #    endif
 
@@ -211,17 +231,80 @@ namespace alpaka
 
             auto output_stream = sycl::stream{buf_size, buf_per_work_item, cgh};
 #    endif
-            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(4)
-              else
-            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(8)
-              else
-            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(16)
-              else
-            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(32)
-              else
-            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(64)
-              else
-            LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(0)
+       
+            constexpr std::size_t sub_group_size = trait::WarpSize<TKernelFnObj, TAcc>::warp_size;
+            bool supported = false;
+
+            if constexpr(sub_group_size == 0) {
+              // no explicit subgroup size requirement
+              LAUNCH_SYCL_KERNEL_WITH_DEFAULT_SUBGROUP_SIZE
+              supported = true;
+            } else {
+#   if(SYCL_SUBGROUP_SIZE == 0)
+              // no explicit SYCL target, assume JIT compilation
+              LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(sub_group_size)
+              supported = true;
+#    else
+              // check if the kernel should be launched with a subgroup size of 4
+              if constexpr(sub_group_size == 4) {
+#    if(SYCL_SUBGROUP_SIZE & 4)
+                LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(4)
+#    else
+                // empty kernel, required to keep SYCL happy
+                LAUNCH_EMPTY_SYCL_KERNEL
+#    endif
+                supported = true;
+              } 
+ 
+              // check if the kernel should be launched with a subgroup size of 8
+              if constexpr(sub_group_size == 8) {
+#    if(SYCL_SUBGROUP_SIZE & 8)
+                LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(8)
+#    else
+                // empty kernel, required to keep SYCL happy
+                LAUNCH_EMPTY_SYCL_KERNEL
+#    endif
+                supported = true;
+              } 
+ 
+              // check if the kernel should be launched with a subgroup size of 16
+              if constexpr(sub_group_size == 16) {
+#    if(SYCL_SUBGROUP_SIZE & 16)
+                LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(16)
+#    else
+                // empty kernel, required to keep SYCL happy
+                LAUNCH_EMPTY_SYCL_KERNEL
+#    endif
+                supported = true;
+              } 
+ 
+              // check if the kernel should be launched with a subgroup size of 32
+              if constexpr(sub_group_size == 32) {
+#    if(SYCL_SUBGROUP_SIZE & 32)
+                LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(32)
+#    else
+                // empty kernel, required to keep SYCL happy
+                LAUNCH_EMPTY_SYCL_KERNEL
+#    endif
+                supported = true;
+              } 
+ 
+              // check if the kernel should be launched with a subgroup size of 64
+              if constexpr(sub_group_size == 64) {
+#    if(SYCL_SUBGROUP_SIZE & 64)
+                LAUNCH_SYCL_KERNEL_IF_SUBGROUP_SIZE_IS(64)
+#    else
+                // empty kernel, required to keep SYCL happy
+                LAUNCH_EMPTY_SYCL_KERNEL
+#    endif
+                supported = true;
+              } 
+#    endif
+
+              // this subgroup size is not support, raise an exception
+              if (not supported)
+                throw sycl::errc::kernel_not_supported;
+            }  
         }
 
         static constexpr auto is_sycl_task = true;
