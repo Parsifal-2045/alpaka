@@ -18,6 +18,7 @@ namespace alpaka
     template<typename TDim, typename TIdx>
     class WorkDivGenericSycl : public concepts::Implements<ConceptWorkDiv, WorkDivGenericSycl<TDim, TIdx>>
     {
+      static_assert(TDim::value > 0, "The SYCL work division mush have a dimension greater than zero.");
     public:
         using WorkDivBase = WorkDivGenericSycl;
 
