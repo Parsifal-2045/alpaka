@@ -43,14 +43,18 @@ namespace alpaka::warp::trait
     template<typename TDim>
     struct Activemask<warp::WarpGenericSycl<TDim>>
     {
-        // FIXME This should be std::uint64_t on AMD GCN architectures.
+        // FIXME This should be std::uint64_t on AMD GCN architectures and on CPU,
+        // but the former is not targeted in alpaka and CPU case is not supported in SYCL yet.
+        // Restrict to warpSize <= 32 for now.
         static auto activemask(warp::WarpGenericSycl<TDim> const& warp) -> std::uint32_t
         {
             // SYCL has no way of querying this. Since sub-group functions have to be executed in convergent code
             // regions anyway we return the full mask.
             auto const sub_group = warp.m_item_warp.get_sub_group();
             auto const mask = sycl::ext::oneapi::group_ballot(sub_group, true);
-            // FIXME This should be std::uint64_t on AMD GCN architectures.
+            // FIXME This should be std::uint64_t on AMD GCN architectures and on CPU,
+            // but the former is not targeted in alpaka and CPU case is not supported in SYCL yet.
+            // Restrict to warpSize <= 32 for now.
             std::uint32_t bits = 0;
             mask.extract_bits(bits);
             return bits;
@@ -80,12 +84,16 @@ namespace alpaka::warp::trait
     template<typename TDim>
     struct Ballot<warp::WarpGenericSycl<TDim>>
     {
-        // FIXME This should be std::uint64_t on AMD GCN architectures.
+        // FIXME This should be std::uint64_t on AMD GCN architectures and on CPU,
+        // but the former is not targeted in alpaka and CPU case is not supported in SYCL yet.
+        // Restrict to warpSize <= 32 for now.
         static auto ballot(warp::WarpGenericSycl<TDim> const& warp, std::int32_t predicate) -> std::uint32_t
         {
             auto const sub_group = warp.m_item_warp.get_sub_group();
             auto const mask = sycl::ext::oneapi::group_ballot(sub_group, static_cast<bool>(predicate));
-            // FIXME This should be std::uint64_t on AMD GCN architectures.
+            // FIXME This should be std::uint64_t on AMD GCN architectures and on CPU,
+            // but the former is not targeted in alpaka and CPU case is not supported in SYCL yet.
+            // Restrict to warpSize <= 32 for now.
             std::uint32_t bits = 0;
             mask.extract_bits(bits);
             return bits;

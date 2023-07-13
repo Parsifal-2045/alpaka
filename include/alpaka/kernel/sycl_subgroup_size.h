@@ -36,7 +36,7 @@
 
 #    elif defined(__SYCL_TARGET_INTEL_X86_64__) /* generate code ahead of time for x86_64 CPUs */
 
-#        define SYCL_SUBGROUP_SIZE (4 | 8 | 16 | 32 | 64)
+#        define SYCL_SUBGROUP_SIZE (4 | 8 | 16 | 32)
 
 #    elif defined(__SYCL_TARGET_NVIDIA_GPU_SM_50__) || /* NVIDIA Maxwell architecture (compute capability 5.0) */     \
         defined(__SYCL_TARGET_NVIDIA_GPU_SM_52__) || /* NVIDIA Maxwell architecture (compute capability 5.2) */       \
