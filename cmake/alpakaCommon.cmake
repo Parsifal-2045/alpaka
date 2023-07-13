@@ -548,9 +548,6 @@ if(alpaka_ACC_SYCL_ENABLE)
 
         # Enable device-side printing to stdout
         cmake_dependent_option(alpaka_SYCL_ENABLE_IOSTREAM "Enable device-side printing to stdout" OFF "alpaka_ACC_SYCL_ENABLE" OFF)
-        if(BUILD_TESTING)
-            set(alpaka_SYCL_ENABLE_IOSTREAM ON CACHE BOOL "Enable device-side printing to stdout" FORCE)
-        endif()
 
         alpaka_set_compiler_options(HOST_DEVICE target alpaka "-fsycl")
         target_link_options(alpaka INTERFACE "-fsycl")
