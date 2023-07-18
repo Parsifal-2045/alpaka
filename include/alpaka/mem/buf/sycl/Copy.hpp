@@ -60,7 +60,7 @@ namespace alpaka::detail
         }
 
 #    if ALPAKA_DEBUG >= ALPAKA_DEBUG_FULL
-        ALPAKA_FN_HOST auto printDebug() const -> void
+        auto printDebug() const -> void
         {
             std::cout << __func__ << " e: " << m_extent << " ewb: " << this->m_extentWidthBytes
                       << " de: " << m_dstExtent << " dptr: " << reinterpret_cast<void*>(m_dstMemNative)
@@ -94,7 +94,7 @@ namespace alpaka::detail
 
         using TaskCopySyclBase<TDim, TViewDst, TViewSrc, TExtent>::TaskCopySyclBase;
 
-        ALPAKA_FN_HOST auto operator()(sycl::queue& queue, std::vector<sycl::event> const& requirements) const
+        auto operator()(sycl::queue& queue, std::vector<sycl::event> const& requirements) const
             -> sycl::event
         {
             ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
@@ -146,7 +146,7 @@ namespace alpaka::detail
         using TaskCopySyclBase<DimInt<1u>, TViewDst, TViewSrc, TExtent>::TaskCopySyclBase;
         using Elem = alpaka::Elem<TViewSrc>;
 
-        ALPAKA_FN_HOST auto operator()(sycl::queue& queue, std::vector<sycl::event> const& requirements) const
+        auto operator()(sycl::queue& queue, std::vector<sycl::event> const& requirements) const
             -> sycl::event
         {
             ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
@@ -180,7 +180,7 @@ namespace alpaka::detail
         using Elem = alpaka::Elem<TViewSrc>;
 
         template<typename TViewDstFwd>
-        ALPAKA_FN_HOST TaskCopySycl(
+        TaskCopySycl(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
             [[maybe_unused]] TExtent const& extent)
@@ -212,7 +212,7 @@ namespace alpaka::trait
     struct CreateTaskMemcpy<TDim, DevGenericSycl<TPltf>, DevCpu>
     {
         template<typename TExtent, typename TViewSrc, typename TViewDstFwd>
-        ALPAKA_FN_HOST static auto createTaskMemcpy(
+        static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
             TExtent const& extent)
@@ -229,7 +229,7 @@ namespace alpaka::trait
     struct CreateTaskMemcpy<TDim, DevCpu, DevGenericSycl<TPltf>>
     {
         template<typename TExtent, typename TViewSrc, typename TViewDstFwd>
-        ALPAKA_FN_HOST static auto createTaskMemcpy(
+        static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
             TExtent const& extent)
@@ -246,7 +246,7 @@ namespace alpaka::trait
     struct CreateTaskMemcpy<TDim, DevGenericSycl<TPltfDst>, DevGenericSycl<TPltfSrc>>
     {
         template<typename TExtent, typename TViewSrc, typename TViewDstFwd>
-        ALPAKA_FN_HOST static auto createTaskMemcpy(
+        static auto createTaskMemcpy(
             TViewDstFwd&& viewDst,
             TViewSrc const& viewSrc,
             TExtent const& extent)
