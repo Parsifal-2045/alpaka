@@ -17,7 +17,8 @@ TEMPLATE_LIST_TEST_CASE("NativeHandle", "[handle]", alpaka::test::TestAccs)
     auto handle = alpaka::getNativeHandle(dev);
 
     STATIC_REQUIRE(std::is_same_v<alpaka::NativeHandle<Dev>, decltype(handle)>);
-    /* The SYCL backend does not use an int as the native handle type
+    // The SYCL backend does not use an int as the native handle type
+#ifndef ALPAKA_ACC_SYCL_ENABLED
     STATIC_REQUIRE(std::is_same_v<alpaka::NativeHandle<Dev>, int>);
-    */
+#endif
 }

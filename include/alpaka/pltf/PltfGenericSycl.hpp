@@ -236,7 +236,6 @@ namespace alpaka::trait
 #        endif
 
             std::cout << "Aspects: " << '\n';
-            std::cout.flush();
 
 #        if defined(BOOST_COMP_ICPX)
 #            if BOOST_COMP_ICPX >= BOOST_VERSION_NUMBER(53, 2, 0)

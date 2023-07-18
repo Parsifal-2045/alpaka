@@ -88,14 +88,11 @@ struct ShflMultipleThreadWarpTestKernel
     }
 };
 
-namespace alpaka::trait
+template<std::uint32_t TWarpSize, typename TAcc>
+struct alpaka::trait::WarpSize<ShflMultipleThreadWarpTestKernel<TWarpSize>, TAcc>
 {
-    template<std::uint32_t TWarpSize, typename TAcc>
-    struct WarpSize<ShflMultipleThreadWarpTestKernel<TWarpSize>, TAcc>
-    {
-        static constexpr std::uint32_t warp_size = TWarpSize;
-    };
-} // namespace alpaka::trait
+    static constexpr std::uint32_t warp_size = TWarpSize;
+};
 
 TEMPLATE_LIST_TEST_CASE("shfl", "[warp]", alpaka::test::TestAccs)
 {

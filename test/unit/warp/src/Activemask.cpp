@@ -54,14 +54,11 @@ struct ActivemaskMultipleThreadWarpTestKernel
     }
 };
 
-namespace alpaka::trait
+template<std::uint32_t TWarpSize, typename TAcc>
+struct alpaka::trait::WarpSize<ActivemaskMultipleThreadWarpTestKernel<TWarpSize>, TAcc>
 {
-    template<std::uint32_t TWarpSize, typename TAcc>
-    struct WarpSize<ActivemaskMultipleThreadWarpTestKernel<TWarpSize>, TAcc>
-    {
-        static constexpr std::uint32_t warp_size = TWarpSize;
-    };
-} // namespace alpaka::trait
+    static constexpr std::uint32_t warp_size = TWarpSize;
+};
 
 TEMPLATE_LIST_TEST_CASE("activemask", "[warp]", alpaka::test::TestAccs)
 {

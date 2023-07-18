@@ -192,10 +192,13 @@ namespace alpaka::trait
             }
 #    endif
 
+            const auto& [nativeDev, nativeContext] = dev.getNativeHandle();
             TElem* memPtr = sycl::malloc_device<TElem>(
-                static_cast<std::size_t>(getExtentProduct(extent)),
-                dev.getNativeHandle().first,
-                dev.getNativeHandle().second);
+                 static_cast<std::size_t>(getExtentProduct(extent)),
+                nativeDev,
+                nativeContext);
+            // captured structured bindings are a C++20 extension
+            // auto deleter = [nativeContext](TElem* ptr) { sycl::free(ptr, nativeContext); };
             auto deleter = [&dev](TElem* ptr) { sycl::free(ptr, dev.getNativeHandle().second); };
 
             return BufGenericSycl<TElem, TDim, TIdx, TPltf>(dev, memPtr, std::move(deleter), extent);
@@ -204,7 +207,7 @@ namespace alpaka::trait
 
     //! The BufGenericSycl stream-ordered memory allocation capability trait specialization.
     template<typename TDim, typename TPltf>
-    struct HasAsyncBufSupport<TDim, DevGenericSycl<TPltf>> : public std::false_type
+    struct HasAsyncBufSupport<TDim, DevGenericSycl<TPltf>> : std::false_type
     {
     };
 

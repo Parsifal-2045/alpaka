@@ -58,14 +58,11 @@ struct AllMultipleThreadWarpTestKernel
     }
 };
 
-namespace alpaka::trait
+template<std::uint32_t TWarpSize, typename TAcc>
+struct alpaka::trait::WarpSize<AllMultipleThreadWarpTestKernel<TWarpSize>, TAcc>
 {
-    template<std::uint32_t TWarpSize, typename TAcc>
-    struct WarpSize<AllMultipleThreadWarpTestKernel<TWarpSize>, TAcc>
-    {
-        static constexpr std::uint32_t warp_size = TWarpSize;
-    };
-} // namespace alpaka::trait
+    static constexpr std::uint32_t warp_size = TWarpSize;
+};
 
 TEMPLATE_LIST_TEST_CASE("all", "[warp]", alpaka::test::TestAccs)
 {
