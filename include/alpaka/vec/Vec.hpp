@@ -255,14 +255,14 @@ namespace alpaka
             return foldrAll(meta::max<TVal>(), std::numeric_limits<TVal>::min());
         }
 
-        //! \return True if all values are true, i.e., the "logcal and" of all values.
+        //! \return True if all values are true, i.e., the "logical and" of all values.
         ALPAKA_NO_HOST_ACC_WARNING
         [[nodiscard]] ALPAKA_FN_HOST_ACC constexpr auto all() const -> bool
         {
             return foldrAll(std::logical_and<TVal>(), true);
         }
 
-        //! \return True if any value is true, i.e., the "logcal or" of all values.
+        //! \return True if any value is true, i.e., the "logical or" of all values.
         ALPAKA_NO_HOST_ACC_WARNING
         [[nodiscard]] ALPAKA_FN_HOST_ACC constexpr auto any() const -> bool
         {
