@@ -24,8 +24,8 @@
 #    include <CL/sycl.hpp>
 
 // if SYCL is enabled with the AMD backend the printf will be killed because of missing compiler support
+#    include <cstdio> // the define printf(...) breaks <cstdio> if it is included afterwards
 #    ifdef __AMDGCN__
-#        include <cstdio> // the define breaks <cstdio> if it is included afterwards
 #        define printf(...)
 #    else
 

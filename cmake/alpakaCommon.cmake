@@ -552,8 +552,6 @@ if(alpaka_ACC_SYCL_ENABLE)
         alpaka_set_compiler_options(HOST_DEVICE target alpaka "-fsycl")
         target_link_options(alpaka INTERFACE "-fsycl")
         alpaka_set_compiler_options(HOST_DEVICE target alpaka "-sycl-std=2020")
-        alpaka_set_compiler_options(HOST_DEVICE target alpaka "-Wno-unused-lambda-capture")
-        alpaka_set_compiler_options(HOST_DEVICE target alpaka "-Wno-unused-parameter")
 
         #-----------------------------------------------------------------------------------------------------------------
         # Determine SYCL targets

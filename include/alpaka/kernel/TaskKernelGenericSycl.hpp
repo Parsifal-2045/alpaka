@@ -29,6 +29,12 @@
 
 #ifdef ALPAKA_ACC_SYCL_ENABLED
 
+#if BOOST_COMP_CLANG
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wunused-lambda-capture"
+#    pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
+
 #    include "alpaka/kernel/sycl_subgroup_size.h"
 #    include <CL/sycl.hpp>
 
@@ -346,7 +352,12 @@ namespace alpaka
         TKernelFnObj m_kernelFnObj;
         core::Tuple<std::decay_t<TArgs>...> m_args;
     };
+
 } // namespace alpaka
+
+#if BOOST_COMP_CLANG
+#    pragma clang diagnostic pop
+#endif
 
 namespace alpaka::trait
 {

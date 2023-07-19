@@ -134,7 +134,7 @@ namespace alpaka::rand
                     oneapi::dpl::uniform_real_distribution<T> distr;
                     return distr(engine.rng_engine);
                 } else {
-                    oneapi::dpl::uniform_int_distribution<unsigned int> distr;
+                    oneapi::dpl::uniform_int_distribution<T> distr;
                     return distr(engine.rng_engine);
                 }
             }
