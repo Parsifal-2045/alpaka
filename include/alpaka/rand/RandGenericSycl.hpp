@@ -4,12 +4,12 @@
 
 #pragma once
 
-#if defined(ALPAKA_ACC_SYCL_ENABLED)
+#    include "alpaka/core/BoostPredef.hpp"
+#    include "alpaka/core/Concepts.hpp"
+#    include "alpaka/dev/DevGenericSycl.hpp"
+#    include "alpaka/rand/Traits.hpp"
 
-#    include <alpaka/core/BoostPredef.hpp>
-#    include <alpaka/core/Concepts.hpp>
-#    include <alpaka/dev/DevGenericSycl.hpp>
-#    include <alpaka/rand/Traits.hpp>
+#ifdef ALPAKA_ACC_SYCL_ENABLED
 
 // Backend specific imports.
 #    include <CL/sycl.hpp>

@@ -13,6 +13,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdio> // the define printf(...) breaks <cstdio> if it is included afterwards
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -24,7 +25,6 @@
 #    include <CL/sycl.hpp>
 
 // if SYCL is enabled with the AMD backend the printf will be killed because of missing compiler support
-#    include <cstdio> // the define printf(...) breaks <cstdio> if it is included afterwards
 #    ifdef __AMDGCN__
 #        define printf(...)
 #    else

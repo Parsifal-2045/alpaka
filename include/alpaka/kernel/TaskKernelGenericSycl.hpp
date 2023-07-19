@@ -78,7 +78,7 @@
                     });
 
 #        define LAUNCH_EMPTY_SYCL_KERNEL                                                                              \
-                throw sycl::errc::kernel_not_supported;                                                               \
+                throw sycl::exception(sycl::make_error_code(sycl::errc::kernel_not_supported));                       \
                 cgh.parallel_for(                                                                                     \
                     sycl::nd_range<TDim::value>{global_size, local_size},                                             \
                     [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,       \
@@ -123,7 +123,7 @@
                     });
 
 #        define LAUNCH_EMPTY_SYCL_KERNEL                                                                              \
-                throw sycl::errc::kernel_not_supported;                                                               \
+                throw sycl::exception(sycl::make_error_code(sycl::errc::kernel_not_supported));                       \
                 cgh.parallel_for(                                                                                     \
                     sycl::nd_range<TDim::value>{global_size, local_size},                                             \
                    [item_elements,dyn_shared_accessor,st_shared_accessor,global_fence_dummy,local_fence_dummy,        \
@@ -309,7 +309,7 @@ namespace alpaka
 
               // this subgroup size is not support, raise an exception
               if (not supported)
-                throw sycl::errc::kernel_not_supported;
+                throw sycl::exception(sycl::make_error_code(sycl::errc::kernel_not_supported));
             }  
         }
 

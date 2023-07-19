@@ -8,22 +8,13 @@
 
 // TODO: SYCL doesn't have a way to detect if we're looking at device or host code. This needs a workaround so that
 // SYCL and other back-ends are compatible.
-#ifdef ALPAKA_ACC_SYCL_ENABLED
+#if defined(ALPAKA_ACC_SYCL_ENABLED) && defined(ALPAKA_SYCL_IOSTREAM_ENABLED)
 #    define ALPAKA_CHECK(success, expression)                                                                         \
         do                                                                                                            \
         {                                                                                                             \
             if(!(expression))                                                                                         \
             {                                                                                                         \
-                /*if constexpr(alpaka::accMatchesTags<   TODO                                                         \
-                                 decltype(acc),                                                                       \
-                                 alpaka::TagCpuSycl,                                                                  \
-                                 alpaka::TagFpgaSyclIntel,                                                            \
-                                 alpaka::TagFpgaSyclXilinx,                                                           \
-                                 alpaka::TagGpuSyclIntel,                                                             \
-                                 alpaka::TagGenericSycl>)                                                             \
-                    acc.cout << "ALPAKA_CHECK failed because '!(" << #expression << ")'\n";                           \
-                else                                                                                                  \
-                    printf("ALPAKA_CHECK failed because '!(%s)'\n", #expression);*/                                   \
+                acc.cout << "ALPAKA_CHECK failed because '!(" << #expression << ")'\n";                               \
                 success = false;                                                                                      \
             }                                                                                                         \
         } while(0)

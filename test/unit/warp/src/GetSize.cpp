@@ -12,6 +12,7 @@
 
 #include <cstdint>
 
+template<std::uint32_t TWarpSize>
 struct GetSizeTestKernel
 {
     ALPAKA_NO_HOST_ACC_WARNING
@@ -20,6 +21,12 @@ struct GetSizeTestKernel
     {
         ALPAKA_CHECK(*success, alpaka::warp::getSize(acc) == expectedWarpSize);
     }
+};
+
+template<std::uint32_t TWarpSize, typename TAcc>
+struct alpaka::trait::WarpSize<GetSizeTestKernel<TWarpSize>, TAcc>
+{
+    static constexpr std::uint32_t warp_size = TWarpSize;
 };
 
 TEMPLATE_LIST_TEST_CASE("getSize", "[warp]", alpaka::test::TestAccs)
@@ -38,6 +45,26 @@ TEMPLATE_LIST_TEST_CASE("getSize", "[warp]", alpaka::test::TestAccs)
         [](std::size_t ws)
         {
             alpaka::test::KernelExecutionFixture<Acc> fixture(alpaka::Vec<Dim, Idx>::all(8));
-            return fixture(GetSizeTestKernel{}, static_cast<std::int32_t>(ws));
+            if(ws == 4)
+            {
+                return fixture(GetSizeTestKernel<4>{}, static_cast<std::int32_t>(ws));
+            }
+            else if(ws == 8)
+            {
+                return fixture(GetSizeTestKernel<8>{}, static_cast<std::int32_t>(ws));
+            }
+            else if(ws == 16)
+            {
+                return fixture(GetSizeTestKernel<16>{}, static_cast<std::int32_t>(ws));
+            }
+            else if(ws == 32)
+            {
+                return fixture(GetSizeTestKernel<32>{}, static_cast<std::int32_t>(ws));
+            }
+            else if(ws == 64)
+            {
+                return fixture(GetSizeTestKernel<64>{}, static_cast<std::int32_t>(ws));
+            }
+            return fixture(GetSizeTestKernel<0>{}, static_cast<std::int32_t>(ws));
         }));
 }
