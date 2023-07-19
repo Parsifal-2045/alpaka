@@ -25,9 +25,7 @@ struct GetSizeTestKernel
 
 template<std::uint32_t TWarpSize, typename TAcc>
 struct alpaka::trait::WarpSize<GetSizeTestKernel<TWarpSize>, TAcc>
-{
-    static constexpr std::uint32_t warp_size = TWarpSize;
-};
+    : std::integral_constant<std::uint32_t, TWarpSize> {};
 
 TEMPLATE_LIST_TEST_CASE("getSize", "[warp]", alpaka::test::TestAccs)
 {

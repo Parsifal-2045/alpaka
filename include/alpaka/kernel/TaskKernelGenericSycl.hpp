@@ -238,7 +238,7 @@ namespace alpaka
             auto output_stream = sycl::stream{buf_size, buf_per_work_item, cgh};
 #    endif
        
-            constexpr std::size_t sub_group_size = trait::WarpSize<TKernelFnObj, TAcc>::warp_size;
+            constexpr std::size_t sub_group_size = trait::warpSize<TKernelFnObj, TAcc>;
             bool supported = false;
 
             if constexpr(sub_group_size == 0) {
